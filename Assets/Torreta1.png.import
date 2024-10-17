@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c3xspqxshjvk8"
-path="res://.godot/imported/Proyectil.png-2ba801efdb4a034f6d9eb50dde00553a.ctex"
+uid="uid://ci11n63mtd26m"
+path="res://.godot/imported/Torreta1.png-c10c1117967a876878b0b40cc4265886.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Proyectil.png"
-dest_files=["res://.godot/imported/Proyectil.png-2ba801efdb4a034f6d9eb50dde00553a.ctex"]
+source_file="res://Assets/Torreta1.png"
+dest_files=["res://.godot/imported/Torreta1.png-c10c1117967a876878b0b40cc4265886.ctex"]
 
 [params]
 

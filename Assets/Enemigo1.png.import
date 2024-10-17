@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cam0bif85v20e"
-path="res://.godot/imported/Eemigo2.png-a632d02642f2b3687e72b3c3109c112d.ctex"
+uid="uid://g8t5e8rc681m"
+path="res://.godot/imported/Enemigo1.png-1790cfcf4c302e0b66b383740dd77022.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Eemigo2.png"
-dest_files=["res://.godot/imported/Eemigo2.png-a632d02642f2b3687e72b3c3109c112d.ctex"]
+source_file="res://Assets/Enemigo1.png"
+dest_files=["res://.godot/imported/Enemigo1.png-1790cfcf4c302e0b66b383740dd77022.ctex"]
 
 [params]
 
