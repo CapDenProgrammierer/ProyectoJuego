@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://dnh5umy1xv2ht"
+path="res://.godot/imported/tile-split.obj-b474af66e8cbbaa1d8826da6ccef7d48.mesh"
+
+[deps]
+
+files=["res://.godot/imported/tile-split.obj-b474af66e8cbbaa1d8826da6ccef7d48.mesh"]
+
+source_file="res://Assets/Models/OBJ format/tile-split.obj"
+dest_files=["res://.godot/imported/tile-split.obj-b474af66e8cbbaa1d8826da6ccef7d48.mesh", "res://.godot/imported/tile-split.obj-b474af66e8cbbaa1d8826da6ccef7d48.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://drn643yw78m0c"
+path="res://.godot/imported/tower-round-middle-a.obj-ce90e440cb3ed0b2ebb8ed70a3f96048.mesh"
+
+[deps]
+
+files=["res://.godot/imported/tower-round-middle-a.obj-ce90e440cb3ed0b2ebb8ed70a3f96048.mesh"]
+
+source_file="res://Assets/Models/OBJ format/tower-round-middle-a.obj"
+dest_files=["res://.godot/imported/tower-round-middle-a.obj-ce90e440cb3ed0b2ebb8ed70a3f96048.mesh", "res://.godot/imported/tower-round-middle-a.obj-ce90e440cb3ed0b2ebb8ed70a3f96048.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://d2sr3i182m44x"
+path="res://.godot/imported/snow-detail-crystal.obj-8f1f38bfb76d26c12c8221fb7b7baecb.mesh"
+
+[deps]
+
+files=["res://.godot/imported/snow-detail-crystal.obj-8f1f38bfb76d26c12c8221fb7b7baecb.mesh"]
+
+source_file="res://Assets/Models/OBJ format/snow-detail-crystal.obj"
+dest_files=["res://.godot/imported/snow-detail-crystal.obj-8f1f38bfb76d26c12c8221fb7b7baecb.mesh", "res://.godot/imported/snow-detail-crystal.obj-8f1f38bfb76d26c12c8221fb7b7baecb.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

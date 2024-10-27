@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://bko7txesvrgg2"]
+
+[ext_resource type="Script" path="res://Node3D.cs" id="1_b01q4"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yeryp"]
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_b01q4")
+
+[node name="floor" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.596602, -0.298328, 2.25101)
+size = Vector3(10.9791, 0.001, 8.77924)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.998787, 0.041966, 0.0257443, -0.0448838, 0.991035, 0.125837, -0.0202327, -0.12684, 0.991717, 1.96119, 1.43697, 6.51213)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.867613, -0.171086, -0.466881, 0.433067, -0.201389, 0.878575, -0.244337, -0.964454, -0.100636, 0, 0, 0)
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+shape = SubResource("BoxShape3D_yeryp")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="RigidBody3D/CollisionShape3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.141284, 3.00736, 0.906307)

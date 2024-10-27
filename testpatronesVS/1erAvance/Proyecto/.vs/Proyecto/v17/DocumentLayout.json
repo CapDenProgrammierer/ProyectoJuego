@@ -1,0 +1,128 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\rrd12\\OneDrive\\CENFOTEC\\2024C3\\Patrones de diseno\\Para proyecto\\1erAvance\\Proyecto\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{AECFA138-7842-4DD1-A999-18CB514DF416}|Proyecto\\Proyecto.csproj|c:\\users\\rrd12\\onedrive\\cenfotec\\2024c3\\patrones de diseno\\para proyecto\\1eravance\\proyecto\\proyecto\\torreta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AECFA138-7842-4DD1-A999-18CB514DF416}|Proyecto\\Proyecto.csproj|solutionrelative:proyecto\\torreta.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AECFA138-7842-4DD1-A999-18CB514DF416}|Proyecto\\Proyecto.csproj|c:\\users\\rrd12\\onedrive\\cenfotec\\2024c3\\patrones de diseno\\para proyecto\\1eravance\\proyecto\\proyecto\\enemigobuild.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AECFA138-7842-4DD1-A999-18CB514DF416}|Proyecto\\Proyecto.csproj|solutionrelative:proyecto\\enemigobuild.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AECFA138-7842-4DD1-A999-18CB514DF416}|Proyecto\\Proyecto.csproj|c:\\users\\rrd12\\onedrive\\cenfotec\\2024c3\\patrones de diseno\\para proyecto\\1eravance\\proyecto\\proyecto\\enemigo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AECFA138-7842-4DD1-A999-18CB514DF416}|Proyecto\\Proyecto.csproj|solutionrelative:proyecto\\enemigo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AECFA138-7842-4DD1-A999-18CB514DF416}|Proyecto\\Proyecto.csproj|c:\\users\\rrd12\\onedrive\\cenfotec\\2024c3\\patrones de diseno\\para proyecto\\1eravance\\proyecto\\proyecto\\torre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AECFA138-7842-4DD1-A999-18CB514DF416}|Proyecto\\Proyecto.csproj|solutionrelative:proyecto\\torre.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AECFA138-7842-4DD1-A999-18CB514DF416}|Proyecto\\Proyecto.csproj|c:\\users\\rrd12\\onedrive\\cenfotec\\2024c3\\patrones de diseno\\para proyecto\\1eravance\\proyecto\\proyecto\\game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AECFA138-7842-4DD1-A999-18CB514DF416}|Proyecto\\Proyecto.csproj|solutionrelative:proyecto\\game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AECFA138-7842-4DD1-A999-18CB514DF416}|Proyecto\\Proyecto.csproj|c:\\users\\rrd12\\onedrive\\cenfotec\\2024c3\\patrones de diseno\\para proyecto\\1eravance\\proyecto\\proyecto\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AECFA138-7842-4DD1-A999-18CB514DF416}|Proyecto\\Proyecto.csproj|solutionrelative:proyecto\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "EnemigoBuild.cs",
+              "DocumentMoniker": "C:\\Users\\rrd12\\OneDrive\\CENFOTEC\\2024C3\\Patrones de diseno\\Para proyecto\\1erAvance\\Proyecto\\Proyecto\\EnemigoBuild.cs",
+              "RelativeDocumentMoniker": "Proyecto\\EnemigoBuild.cs",
+              "ToolTip": "C:\\Users\\rrd12\\OneDrive\\CENFOTEC\\2024C3\\Patrones de diseno\\Para proyecto\\1erAvance\\Proyecto\\Proyecto\\EnemigoBuild.cs",
+              "RelativeToolTip": "Proyecto\\EnemigoBuild.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-27T03:33:57.22Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Enemigo.cs",
+              "DocumentMoniker": "C:\\Users\\rrd12\\OneDrive\\CENFOTEC\\2024C3\\Patrones de diseno\\Para proyecto\\1erAvance\\Proyecto\\Proyecto\\Enemigo.cs",
+              "RelativeDocumentMoniker": "Proyecto\\Enemigo.cs",
+              "ToolTip": "C:\\Users\\rrd12\\OneDrive\\CENFOTEC\\2024C3\\Patrones de diseno\\Para proyecto\\1erAvance\\Proyecto\\Proyecto\\Enemigo.cs",
+              "RelativeToolTip": "Proyecto\\Enemigo.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAYAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-17T03:18:56.091Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\rrd12\\OneDrive\\CENFOTEC\\2024C3\\Patrones de diseno\\Para proyecto\\1erAvance\\Proyecto\\Proyecto\\Program.cs",
+              "RelativeDocumentMoniker": "Proyecto\\Program.cs",
+              "ToolTip": "C:\\Users\\rrd12\\OneDrive\\CENFOTEC\\2024C3\\Patrones de diseno\\Para proyecto\\1erAvance\\Proyecto\\Proyecto\\Program.cs",
+              "RelativeToolTip": "Proyecto\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-17T01:29:32.272Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Torreta.cs",
+              "DocumentMoniker": "C:\\Users\\rrd12\\OneDrive\\CENFOTEC\\2024C3\\Patrones de diseno\\Para proyecto\\1erAvance\\Proyecto\\Proyecto\\Torreta.cs",
+              "RelativeDocumentMoniker": "Proyecto\\Torreta.cs",
+              "ToolTip": "C:\\Users\\rrd12\\OneDrive\\CENFOTEC\\2024C3\\Patrones de diseno\\Para proyecto\\1erAvance\\Proyecto\\Proyecto\\Torreta.cs",
+              "RelativeToolTip": "Proyecto\\Torreta.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-27T03:01:15.912Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Game.cs",
+              "DocumentMoniker": "C:\\Users\\rrd12\\OneDrive\\CENFOTEC\\2024C3\\Patrones de diseno\\Para proyecto\\1erAvance\\Proyecto\\Proyecto\\Game.cs",
+              "RelativeDocumentMoniker": "Proyecto\\Game.cs",
+              "ToolTip": "C:\\Users\\rrd12\\OneDrive\\CENFOTEC\\2024C3\\Patrones de diseno\\Para proyecto\\1erAvance\\Proyecto\\Proyecto\\Game.cs",
+              "RelativeToolTip": "Proyecto\\Game.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-26T13:23:28.084Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Torre.cs",
+              "DocumentMoniker": "C:\\Users\\rrd12\\OneDrive\\CENFOTEC\\2024C3\\Patrones de diseno\\Para proyecto\\1erAvance\\Proyecto\\Proyecto\\Torre.cs",
+              "RelativeDocumentMoniker": "Proyecto\\Torre.cs",
+              "ToolTip": "C:\\Users\\rrd12\\OneDrive\\CENFOTEC\\2024C3\\Patrones de diseno\\Para proyecto\\1erAvance\\Proyecto\\Proyecto\\Torre.cs",
+              "RelativeToolTip": "Proyecto\\Torre.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-17T02:04:20.023Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

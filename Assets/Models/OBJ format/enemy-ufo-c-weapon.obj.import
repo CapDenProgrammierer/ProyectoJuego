@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://0n24ira7fltj"
+path="res://.godot/imported/enemy-ufo-c-weapon.obj-79ae4f289b5105d0ce9d6c36a022c4d8.mesh"
+
+[deps]
+
+files=["res://.godot/imported/enemy-ufo-c-weapon.obj-79ae4f289b5105d0ce9d6c36a022c4d8.mesh"]
+
+source_file="res://Assets/Models/OBJ format/enemy-ufo-c-weapon.obj"
+dest_files=["res://.godot/imported/enemy-ufo-c-weapon.obj-79ae4f289b5105d0ce9d6c36a022c4d8.mesh", "res://.godot/imported/enemy-ufo-c-weapon.obj-79ae4f289b5105d0ce9d6c36a022c4d8.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

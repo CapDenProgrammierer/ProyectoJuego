@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://bjql1lpd6mv8r"
+path="res://.godot/imported/snow-wood-structure-high-part.obj-7b1ff1b0af047af90f673ff89e82d8ae.mesh"
+
+[deps]
+
+files=["res://.godot/imported/snow-wood-structure-high-part.obj-7b1ff1b0af047af90f673ff89e82d8ae.mesh"]
+
+source_file="res://Assets/Models/OBJ format/snow-wood-structure-high-part.obj"
+dest_files=["res://.godot/imported/snow-wood-structure-high-part.obj-7b1ff1b0af047af90f673ff89e82d8ae.mesh", "res://.godot/imported/snow-wood-structure-high-part.obj-7b1ff1b0af047af90f673ff89e82d8ae.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

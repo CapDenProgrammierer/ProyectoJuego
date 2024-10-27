@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://bsxrr8qh8w43o"
+path="res://.godot/imported/tower-round-build-d.obj-8e992451e044abbcde37649b8e8aca09.mesh"
+
+[deps]
+
+files=["res://.godot/imported/tower-round-build-d.obj-8e992451e044abbcde37649b8e8aca09.mesh"]
+
+source_file="res://Assets/Models/OBJ format/tower-round-build-d.obj"
+dest_files=["res://.godot/imported/tower-round-build-d.obj-8e992451e044abbcde37649b8e8aca09.mesh", "res://.godot/imported/tower-round-build-d.obj-8e992451e044abbcde37649b8e8aca09.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://b3leusggwv5in"
+path="res://.godot/imported/snow-detail-dirt.obj-a06ed1c5f516f56d4a955be12af887ec.mesh"
+
+[deps]
+
+files=["res://.godot/imported/snow-detail-dirt.obj-a06ed1c5f516f56d4a955be12af887ec.mesh"]
+
+source_file="res://Assets/Models/OBJ format/snow-detail-dirt.obj"
+dest_files=["res://.godot/imported/snow-detail-dirt.obj-a06ed1c5f516f56d4a955be12af887ec.mesh", "res://.godot/imported/snow-detail-dirt.obj-a06ed1c5f516f56d4a955be12af887ec.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

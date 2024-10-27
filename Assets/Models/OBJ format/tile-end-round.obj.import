@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://w6mor8bc024p"
+path="res://.godot/imported/tile-end-round.obj-d83bc1cdeb3634b1dba7110b0043540b.mesh"
+
+[deps]
+
+files=["res://.godot/imported/tile-end-round.obj-d83bc1cdeb3634b1dba7110b0043540b.mesh"]
+
+source_file="res://Assets/Models/OBJ format/tile-end-round.obj"
+dest_files=["res://.godot/imported/tile-end-round.obj-d83bc1cdeb3634b1dba7110b0043540b.mesh", "res://.godot/imported/tile-end-round.obj-d83bc1cdeb3634b1dba7110b0043540b.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

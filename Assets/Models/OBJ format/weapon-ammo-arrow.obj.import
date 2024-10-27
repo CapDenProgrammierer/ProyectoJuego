@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://ckby0q4wa4fdb"
+path="res://.godot/imported/weapon-ammo-arrow.obj-4464ff7363d52b2f0e675b9ea524418c.mesh"
+
+[deps]
+
+files=["res://.godot/imported/weapon-ammo-arrow.obj-4464ff7363d52b2f0e675b9ea524418c.mesh"]
+
+source_file="res://Assets/Models/OBJ format/weapon-ammo-arrow.obj"
+dest_files=["res://.godot/imported/weapon-ammo-arrow.obj-4464ff7363d52b2f0e675b9ea524418c.mesh", "res://.godot/imported/weapon-ammo-arrow.obj-4464ff7363d52b2f0e675b9ea524418c.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

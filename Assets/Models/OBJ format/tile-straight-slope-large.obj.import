@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://0erva63q645q"
+path="res://.godot/imported/tile-straight-slope-large.obj-27bc5e4b338a57cd0638811857500f32.mesh"
+
+[deps]
+
+files=["res://.godot/imported/tile-straight-slope-large.obj-27bc5e4b338a57cd0638811857500f32.mesh"]
+
+source_file="res://Assets/Models/OBJ format/tile-straight-slope-large.obj"
+dest_files=["res://.godot/imported/tile-straight-slope-large.obj-27bc5e4b338a57cd0638811857500f32.mesh", "res://.godot/imported/tile-straight-slope-large.obj-27bc5e4b338a57cd0638811857500f32.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

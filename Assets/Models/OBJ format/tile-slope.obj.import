@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://dhfdfjjvt2i6i"
+path="res://.godot/imported/tile-slope.obj-88549b8ff654fa195aa20c6658e0e837.mesh"
+
+[deps]
+
+files=["res://.godot/imported/tile-slope.obj-88549b8ff654fa195aa20c6658e0e837.mesh"]
+
+source_file="res://Assets/Models/OBJ format/tile-slope.obj"
+dest_files=["res://.godot/imported/tile-slope.obj-88549b8ff654fa195aa20c6658e0e837.mesh", "res://.godot/imported/tile-slope.obj-88549b8ff654fa195aa20c6658e0e837.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false
