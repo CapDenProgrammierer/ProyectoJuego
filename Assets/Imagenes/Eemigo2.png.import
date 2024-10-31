@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c3xspqxshjvk8"
-path="res://.godot/imported/Proyectil.png-91745dc22398f9de27b2c1f466d30ed4.ctex"
+uid="uid://cam0bif85v20e"
+path="res://.godot/imported/Eemigo2.png-0b28bf7e96ea01e7e110c54c6cee8269.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Imagenes/Proyectil.png"
-dest_files=["res://.godot/imported/Proyectil.png-91745dc22398f9de27b2c1f466d30ed4.ctex"]
+source_file="res://Assets/Imagenes/Eemigo2.png"
+dest_files=["res://.godot/imported/Eemigo2.png-0b28bf7e96ea01e7e110c54c6cee8269.ctex"]
 
 [params]
 

@@ -11,12 +11,17 @@ config_version=5
 [application]
 
 config/name="ProyectoTowerDefense"
+run/main_scene="res://Scenes/Main.tscn"
 config/features=PackedStringArray("4.3", "C#", "Mobile")
-config/icon="res://Imagenes/icon.svg"
+config/icon="res://Assets/Imagenes/icon.svg"
 
 [dotnet]
 
 project/assembly_name="ProyectoTowerDefense"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/MonoBuildToggler/plugin.cfg")
 
 [rendering]
 

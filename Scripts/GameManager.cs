@@ -1,16 +1,34 @@
 using Godot;
 using System;
 
-public partial class NewScript : Node
+public partial class GameManager : Node
 {
-	// Called when the node enters the scene tree for the first time.
-	public override void _Ready()
+	private static GameManager _instance;
+	public static GameManager Instance
 	{
-		
+		get { return _instance; }
 	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
+	private int _gold = 100;
+	private int _lives = 20;
+	public int Gold { get { return _gold; } }
+	public int Lives { get { return _lives; } }
+
+	public override void _EnterTree()
 	{
+		if (_instance == null)
+		{
+			_instance = this;
+		}
+	}
+
+	public bool SpendGold(int amount)
+	{
+		if (_gold >= amount)
+		{
+			_gold -= amount;
+			return true;
+		}
+		return false;
 	}
 }

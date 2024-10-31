@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://chhvv7ujwx5q5"]
+
+[ext_resource type="Script" path="res://Scripts/BasicTower.cs" id="1_aq2lq"]
+
+[sub_resource type="Gradient" id="Gradient_e213p"]
+offsets = PackedFloat32Array(0, 0.0194805, 0.0324675, 0.564935, 0.837662, 0.883117)
+colors = PackedColorArray(0, 0, 0, 1, 0.105078, 0.000129697, 0.185424, 1, 1, 1, 1, 1, 0.111937, 0.000138162, 0.197527, 1, 0.111966, 0.000138198, 0.197578, 1, 0.112427, 0.000138767, 0.198391, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_afl0p"]
+gradient = SubResource("Gradient_e213p")
+width = 32
+height = 32
+fill = 1
+
+[node name="BasicTower" type="Node2D"]
+script = ExtResource("1_aq2lq")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = SubResource("GradientTexture2D_afl0p")

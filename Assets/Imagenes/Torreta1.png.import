@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://h360ejkpo0rw"
-path="res://.godot/imported/icon.svg-6cded66abd63bc86c083932b6f41f6d2.ctex"
+uid="uid://ci11n63mtd26m"
+path="res://.godot/imported/Torreta1.png-896aef31c9999d3786ff79e34d5d80ec.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Imagenes/icon.svg"
-dest_files=["res://.godot/imported/icon.svg-6cded66abd63bc86c083932b6f41f6d2.ctex"]
+source_file="res://Assets/Imagenes/Torreta1.png"
+dest_files=["res://.godot/imported/Torreta1.png-896aef31c9999d3786ff79e34d5d80ec.ctex"]
 
 [params]
 
@@ -32,6 +32,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false
