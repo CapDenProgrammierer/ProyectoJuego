@@ -10,11 +10,6 @@ public partial class GameMain : Node2D
 	private TowerFactory _towerFactory;
 	private TowerFactory.TowerType _selectedTowerType = TowerFactory.TowerType.Basic;
 	
-	// Nuevas variables para enemigos
-	private PackedScene _enemyScene;
-	private float _enemySpawnTime = 2.0f;
-	private float _timeSinceLastSpawn = 0;
-
 	public override void _Ready()
 	{
 		_gameMap = GetNode("TileMap");
@@ -23,44 +18,19 @@ public partial class GameMain : Node2D
 		_ui = GetNode<CanvasLayer>("UI");
 
 		_towerFactory = new TowerFactory();
-		_enemyScene = GD.Load<PackedScene>("res://Scenes/Enemy.tscn");
 
 		InitializeGame();
 	}
 
 	private void InitializeGame()
 	{
-		GD.Print($"Game Started! Gold: {GameManager.Instance.Gold}, Lives: {GameManager.Instance.Lives}");
-		GD.Print("Presiona 1 para Torre Básica (50 oro)");
-		GD.Print("Presiona 2 para Torre Avanzada (150 oro)");
-	}
-
-	public override void _Process(double delta)
-	{
-		_timeSinceLastSpawn += (float)delta;
-		
-		if (_timeSinceLastSpawn >= _enemySpawnTime)
-		{
-			SpawnEnemy();
-			_timeSinceLastSpawn = 0;
-		}
-	}
-
-	private void SpawnEnemy()
-	{
-		if (_enemyScene == null) 
-		{
-			GD.Print("Error: Enemy scene not loaded");
-			return;
-		}
-
-		Enemy enemy = _enemyScene.Instantiate<Enemy>();
-		if (enemy != null)
-		{
-			_enemiesContainer.AddChild(enemy);
-			enemy.Position = new Vector2(0, 300);
-			GD.Print("Enemigo generado");
-		}
+		GD.Print("=== Torres Disponibles ===");
+		GD.Print("1: Torre Básica (50 oro) - Daño: 50, Rango: 100");
+		GD.Print("2: Torre Avanzada (150 oro) - Daño: 100, Rango: 150");
+		GD.Print("3: Torre Elite (300 oro) - Daño: 200, Rango: 200");
+		GD.Print("4: Torre Master (600 oro) - Daño: 400, Rango: 250");
+		GD.Print("5: Torre Ultimate (1200 oro) - Daño: 800, Rango: 300");
+		GD.Print("=====================");
 	}
 
 	public override void _Input(InputEvent @event)
@@ -69,15 +39,29 @@ public partial class GameMain : Node2D
 		{
 			if (eventKey.Pressed)
 			{
-				if (eventKey.Keycode == Key.Key1)
+				_selectedTowerType = eventKey.Keycode switch
 				{
-					_selectedTowerType = TowerFactory.TowerType.Basic;
-					GD.Print("Torre Básica seleccionada");
-				}
-				else if (eventKey.Keycode == Key.Key2)
+					Key.Key1 => TowerFactory.TowerType.Basic,
+					Key.Key2 => TowerFactory.TowerType.Advanced,
+					Key.Key3 => TowerFactory.TowerType.Elite,
+					Key.Key4 => TowerFactory.TowerType.Master,
+					Key.Key5 => TowerFactory.TowerType.Ultimate,
+					_ => _selectedTowerType
+				};
+
+				string towerName = _selectedTowerType switch
 				{
-					_selectedTowerType = TowerFactory.TowerType.Advanced;
-					GD.Print("Torre Avanzada seleccionada");
+					TowerFactory.TowerType.Basic => "Básica",
+					TowerFactory.TowerType.Advanced => "Avanzada",
+					TowerFactory.TowerType.Elite => "Elite",
+					TowerFactory.TowerType.Master => "Master",
+					TowerFactory.TowerType.Ultimate => "Ultimate",
+					_ => ""
+				};
+
+				if (towerName != "")
+				{
+					GameManager.Instance.ShowMessage($"Torre {towerName} seleccionada");
 				}
 			}
 		}
@@ -96,17 +80,13 @@ public partial class GameMain : Node2D
 		Tower tower = _towerFactory.CreateTower(_selectedTowerType);
 		if (tower == null) return;
 
-		GD.Print($"Intentando colocar torre. Costo: {tower.Cost}, Oro disponible: {GameManager.Instance.Gold}");
-
 		if (GameManager.Instance.SpendGold(tower.Cost))
 		{
 			_towersContainer.AddChild(tower);
 			tower.Position = position;
-			GD.Print($"Torre colocada en {position}. Oro restante: {GameManager.Instance.Gold}");
 		}
 		else
 		{
-			GD.Print($"No hay suficiente oro. Necesitas: {tower.Cost}, Tienes: {GameManager.Instance.Gold}");
 			tower.QueueFree();
 		}
 	}
