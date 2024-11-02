@@ -1,5 +1,7 @@
 using Godot;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 public partial class Tower : Node2D
 {
@@ -7,15 +9,19 @@ public partial class Tower : Node2D
 	protected float _range;
 	protected float _attackSpeed;
 	protected int _cost;
-	protected Color _rangeColor = new Color(0, 1, 0, 0.1f); // Color por defecto verde
+	protected Color _rangeColor = new Color(0, 1, 0, 0.1f);
 	
 	protected float _attackTimer = 0;
 	protected Enemy _currentTarget;
-	protected PackedScene _projectileScene;
+	private static PackedScene _projectileScene;
 	protected Sprite2D _towerSprite;
 	private RangeIndicator _rangeIndicator;
 	private bool _initialized = false;
 	private bool _isMouseOver = false;
+	protected IAttackStrategy _attackStrategy;
+
+	public static PackedScene ProjectileScene => _projectileScene;
+	public float Damage => _damage;
 
 	public int Cost 
 	{ 
@@ -32,7 +38,40 @@ public partial class Tower : Node2D
 
 	public int GetSellValue()
 	{
-		return _cost / 2; // 50% del costo original
+		return _cost / 2;
+	}
+
+	public void UpdateUnit(double delta)
+	{
+		_attackTimer += (float)delta;
+
+		if (_currentTarget == null || !IsInstanceValid(_currentTarget) || 
+			!_currentTarget.IsAlive || !IsEnemyInRange(_currentTarget))
+		{
+			_currentTarget = FindNearestEnemy();
+		}
+
+		if (_currentTarget != null && _attackTimer >= _attackSpeed && 
+			IsEnemyInRange(_currentTarget))
+		{
+			Attack();
+			_attackTimer = 0;
+		}
+	}
+
+	public Vector2 GetPosition()
+	{
+		return GlobalPosition;
+	}
+
+	public void TakeDamage(float damage)
+	{
+		// Las torres podrían implementar daño en el futuro
+	}
+
+	public void ApplyEffect(IEffect effect)
+	{
+		// Las torres podrían tener sus propios efectos en el futuro
 	}
 
 	public override void _Ready()
@@ -44,7 +83,6 @@ public partial class Tower : Node2D
 		}
 
 		CreateRangeIndicator();
-
 		_towerSprite = GetNode<Sprite2D>("Sprite2D");
 		if (_towerSprite != null && _towerSprite.Texture != null)
 		{
@@ -52,14 +90,15 @@ public partial class Tower : Node2D
 			float imageSize = _towerSprite.Texture.GetWidth();
 			float scale = targetSize / imageSize;
 			_towerSprite.Scale = new Vector2(scale, scale);
-			GD.Print($"Sprite de torre ajustado a escala {scale} para alcanzar 64x64 píxeles");
-		}
-		else
-		{
-			GD.Print("No se pudo encontrar el sprite o la textura de la torre");
 		}
 
 		_projectileScene = GD.Load<PackedScene>("res://Scenes/Projectile.tscn");
+		UnitManager.Instance?.RegisterTower(this);
+	}
+
+	public override void _ExitTree()
+	{
+		UnitManager.Instance?.UnregisterTower(this);
 	}
 
 	public override void _Process(double delta)
@@ -69,6 +108,10 @@ public partial class Tower : Node2D
 		if (_currentTarget == null || !IsInstanceValid(_currentTarget) || !_currentTarget.IsAlive || !IsEnemyInRange(_currentTarget))
 		{
 			_currentTarget = FindNearestEnemy();
+			if (_currentTarget != null)
+			{
+				GD.Print($"Objetivo encontrado para {GetType().Name}");
+			}
 		}
 
 		if (_currentTarget != null && _attackTimer >= _attackSpeed && IsEnemyInRange(_currentTarget))
@@ -77,7 +120,9 @@ public partial class Tower : Node2D
 			_attackTimer = 0;
 		}
 	}
+	
 
+	
 	public override void _Input(InputEvent @event)
 	{
 		if (@event is InputEventMouseMotion mouseMotion)
@@ -105,14 +150,6 @@ public partial class Tower : Node2D
 		}
 	}
 
-	protected virtual void InitializeTower()
-	{
-		_damage = 0;
-		_range = 0;
-		_attackSpeed = 0;
-		_cost = 0;
-	}
-
 	private void CreateRangeIndicator()
 	{
 		if (_rangeIndicator != null)
@@ -126,27 +163,23 @@ public partial class Tower : Node2D
 
 	protected virtual void Attack()
 	{
-		if (_currentTarget != null && IsEnemyInRange(_currentTarget) && _projectileScene != null)
+		if (_currentTarget != null && IsEnemyInRange(_currentTarget))
 		{
-			var projectile = _projectileScene.Instantiate<Projectile>();
-			GetTree().Root.AddChild(projectile);
-			projectile.GlobalPosition = GlobalPosition;
-			projectile.Initialize(_currentTarget, _damage);
-			GD.Print($"Torre disparando proyectil. Daño: {_damage}");
+			if (_attackStrategy != null)
+			{
+				GD.Print($"Torre {GetType().Name} atacando con estrategia {_attackStrategy.GetType().Name}");
+				_attackStrategy.Attack(this, _currentTarget);
+			}
+			else
+			{
+				GD.PrintErr($"Error: Torre {GetType().Name} no tiene estrategia de ataque");
+			}
 		}
 	}
 
 	protected bool IsEnemyInRange(Enemy enemy)
 	{
-		float distance = GlobalPosition.DistanceTo(enemy.GlobalPosition);
-		bool inRange = distance <= _range;
-		
-		if (_currentTarget == enemy && !inRange)
-		{
-			GD.Print($"Enemigo fuera de rango. Distancia: {distance}, Rango máximo: {_range}");
-		}
-		
-		return inRange;
+		return GlobalPosition.DistanceTo(enemy.GlobalPosition) <= _range;
 	}
 
 	private Enemy FindNearestEnemy()
@@ -168,28 +201,26 @@ public partial class Tower : Node2D
 			}
 		}
 
-		if (nearest != null)
-		{
-			GD.Print($"Nuevo objetivo encontrado a distancia: {nearestDistance}");
-		}
-
 		return nearest;
 	}
-}
 
-public partial class RangeIndicator : Node2D
-{
-	private float _range;
-	private Color _color;
-
-	public RangeIndicator(float range, Color color)
+	public List<Enemy> GetNearestEnemies(int count)
 	{
-		_range = range;
-		_color = color;
+		var enemies = GetTree().GetNodesInGroup("Enemies")
+			.OfType<Enemy>()
+			.Where(e => IsEnemyInRange(e))
+			.OrderBy(e => GlobalPosition.DistanceTo(e.GlobalPosition))
+			.Take(count)
+			.ToList();
+
+		return enemies;
 	}
 
-	public override void _Draw()
+	protected virtual void InitializeTower()
 	{
-		DrawCircle(Vector2.Zero, _range, _color);
+		_damage = 0;
+		_range = 0;
+		_attackSpeed = 0;
+		_cost = 0;
 	}
 }
