@@ -16,6 +16,7 @@ public partial class WaveManager : Node
 	private Node2D _enemiesContainer;
 	private PackedScene _enemyScene;
 	private Random _random = new Random();
+	public int CurrentWave => _currentWave;
 
 	public override void _Ready()
 	{

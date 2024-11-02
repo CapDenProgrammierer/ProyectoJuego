@@ -10,7 +10,8 @@ public partial class Enemy : Node2D
 	private int _goldReward;
 	private bool _isElite;
 	private ColorRect _healthBar;
-	
+ 	private bool _hasReachedEnd = false;
+	private float _endXPosition = 800f; 
 	public bool IsAlive => _health > 0;
 
 	public void Initialize(int health, int damage, float speed, int goldReward, bool isElite)
@@ -83,6 +84,23 @@ public partial class Enemy : Node2D
 
 	public override void _Process(double delta)
 	{
+		if (_hasReachedEnd) return;
+
 		Position += Vector2.Right * _speed * (float)delta;
+
+		if (Position.X >= _endXPosition && !_hasReachedEnd)
+		{
+			ReachedEnd();
+		}
+	}
+	private void ReachedEnd()
+	{
+		_hasReachedEnd = true;
+		if (GameManager.Instance != null)
+		{
+			GameManager.Instance.TakeDamage(_damage);
+			GD.Print($"¡Enemigo llegó al final! Daño causado: {_damage}");
+		}
+		QueueFree(); // Elimina el enemigo
 	}
 }

@@ -9,6 +9,7 @@ public partial class GameMain : Node2D
 	private CanvasLayer _ui;
 	private TowerFactory _towerFactory;
 	private TowerFactory.TowerType _selectedTowerType = TowerFactory.TowerType.Basic;
+	private ColorRect _endZone;
 	
 	public override void _Ready()
 	{
@@ -20,6 +21,16 @@ public partial class GameMain : Node2D
 		_towerFactory = new TowerFactory();
 
 		InitializeGame();
+		CreateEndZone();
+	}
+
+	private void CreateEndZone()
+	{
+		_endZone = new ColorRect();
+		_endZone.Size = new Vector2(20, 600); // Ajusta según el tamaño de tu mapa
+		_endZone.Position = new Vector2(800, 0); // Misma X que _endXPosition en Enemy
+		_endZone.Color = new Color(1, 0, 0, 0.3f); // Rojo semitransparente
+		AddChild(_endZone);
 	}
 
 	private void InitializeGame()
