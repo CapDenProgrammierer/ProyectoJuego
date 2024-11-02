@@ -35,7 +35,24 @@ public partial class GameMain : Node2D
 
 	public override void _Input(InputEvent @event)
 	{
-		if (@event is InputEventKey eventKey)
+		if (@event is InputEventMouseButton mouseButton)
+		{
+			Vector2 clickPosition = GetGlobalMousePosition();
+			
+			if (mouseButton.Pressed)
+			{
+				switch (mouseButton.ButtonIndex)
+				{
+					case MouseButton.Left:
+						TryPlaceTower(clickPosition);
+						break;
+					case MouseButton.Right:
+						TrySellTower(clickPosition);
+						break;
+				}
+			}
+		}
+		else if (@event is InputEventKey eventKey)
 		{
 			if (eventKey.Pressed)
 			{
@@ -65,14 +82,6 @@ public partial class GameMain : Node2D
 				}
 			}
 		}
-
-		if (@event is InputEventMouseButton mouseButton)
-		{
-			if (mouseButton.ButtonIndex == MouseButton.Left && mouseButton.Pressed)
-			{
-				TryPlaceTower(GetGlobalMousePosition());
-			}
-		}
 	}
 
 	private void TryPlaceTower(Vector2 position)
@@ -88,6 +97,27 @@ public partial class GameMain : Node2D
 		else
 		{
 			tower.QueueFree();
+		}
+	}
+
+	private void TrySellTower(Vector2 position)
+	{
+		var towers = _towersContainer.GetChildren();
+		
+		foreach (Node node in towers)
+		{
+			if (node is Tower tower)
+			{
+				float distance = position.DistanceTo(tower.Position);
+				if (distance < 32) // Radio de 32 pixels para detectar el click
+				{
+					int sellValue = tower.GetSellValue();
+					GameManager.Instance.AddGold(sellValue);
+					tower.QueueFree();
+					GameManager.Instance.ShowMessage($"Torre vendida por {sellValue} oro");
+					return;
+				}
+			}
 		}
 	}
 }

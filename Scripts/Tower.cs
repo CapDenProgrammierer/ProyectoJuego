@@ -15,6 +15,7 @@ public partial class Tower : Node2D
 	protected Sprite2D _towerSprite;
 	private RangeIndicator _rangeIndicator;
 	private bool _initialized = false;
+	private bool _isMouseOver = false;
 
 	public int Cost 
 	{ 
@@ -29,6 +30,11 @@ public partial class Tower : Node2D
 		} 
 	}
 
+	public int GetSellValue()
+	{
+		return _cost / 2; // 50% del costo original
+	}
+
 	public override void _Ready()
 	{
 		if (!_initialized)
@@ -37,10 +43,8 @@ public partial class Tower : Node2D
 			_initialized = true;
 		}
 
-		// Crear indicador de rango circular
 		CreateRangeIndicator();
 
-		// Ajustar el tamaño del sprite
 		_towerSprite = GetNode<Sprite2D>("Sprite2D");
 		if (_towerSprite != null && _towerSprite.Texture != null)
 		{
@@ -71,6 +75,33 @@ public partial class Tower : Node2D
 		{
 			Attack();
 			_attackTimer = 0;
+		}
+	}
+
+	public override void _Input(InputEvent @event)
+	{
+		if (@event is InputEventMouseMotion mouseMotion)
+		{
+			Vector2 mousePosition = GetGlobalMousePosition();
+			bool wasMouseOver = _isMouseOver;
+			_isMouseOver = mousePosition.DistanceTo(GlobalPosition) < 32;
+
+			if (wasMouseOver != _isMouseOver)
+			{
+				QueueRedraw();
+			}
+		}
+	}
+
+	public override void _Draw()
+	{
+		base._Draw();
+		
+		if (_isMouseOver)
+		{
+			DrawArc(Vector2.Zero, 36, 0, Mathf.Tau, 32, new Color(1, 1, 1, 0.5f));
+			int sellValue = GetSellValue();
+			GameManager.Instance?.ShowMessage($"Click derecho para vender por {sellValue} oro");
 		}
 	}
 
