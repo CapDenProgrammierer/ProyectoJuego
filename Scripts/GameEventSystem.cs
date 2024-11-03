@@ -11,7 +11,7 @@ public abstract class GameEvent
 {
 	public DateTime Timestamp { get; private set; }
 
-	protected GameEvent()
+	 protected GameEvent()
 	{
 		Timestamp = DateTime.Now;
 	}
@@ -37,7 +37,7 @@ public class WaveEvent : GameEvent
 	public WaveState State { get; private set; }
 	public int EnemyCount { get; private set; }
 
-	public WaveEvent(int waveNumber, WaveState state, int enemyCount)
+	 public WaveEvent(int waveNumber, WaveState state, int enemyCount)
 	{
 		WaveNumber = waveNumber;
 		State = state;
@@ -61,16 +61,16 @@ public class TowerEvent : GameEvent
 	}
 }
 
-public class EnemyEvent : GameEvent
+  public class EnemyEvent : GameEvent
 {
 	public EnemyEventType Type { get; private set; }
-	public Vector2 Position { get; private set; }
+	  public Vector2 Position { get; private set; }
 	public int Reward { get; private set; }
 	public float HealthPercentage { get; private set; }
 
 	public EnemyEvent(EnemyEventType type, Vector2 position, int reward = 0, float healthPercentage = 0)
 	{
-		Type = type;
+		  Type = type;
 		Position = position;
 		Reward = reward;
 		HealthPercentage = healthPercentage;
@@ -80,7 +80,7 @@ public class EnemyEvent : GameEvent
 public enum ResourceType
 {
 	Gold,
-	Lives,
+	 Lives,
 	Score
 }
 
@@ -88,7 +88,7 @@ public enum WaveState
 {
 	Starting,
 	InProgress,
-	Complete
+	 Complete
 }
 
 public enum TowerEventType
@@ -96,7 +96,7 @@ public enum TowerEventType
 	Placed,
 	Sold,
 	Attacking,
-	Upgraded
+	 	Upgraded
 }
 
 public enum EnemyEventType
@@ -107,10 +107,10 @@ public enum EnemyEventType
 	ReachedEnd
 }
 
-public class GameOverEvent : GameEvent
+ public class GameOverEvent : GameEvent
 {
 	public int FinalWave { get; private set; }
-	public int FinalGold { get; private set; }
+	  public int FinalGold { get; private set; }
 	public int FinalScore { get; private set; }
 
 	public GameOverEvent(int finalWave, int finalGold, int finalScore)
@@ -125,7 +125,7 @@ public class MessageEvent : GameEvent
 {
 	public string Message { get; private set; }
 	
-	public MessageEvent(string message)
+	  public MessageEvent(string message)
 	{
 		Message = message;
 	}
@@ -134,7 +134,7 @@ public class MessageEvent : GameEvent
 public partial class GameEventSystem : Node
 {
 	private static GameEventSystem _instance;
-	private List<IGameEventObserver> _observers = new List<IGameEventObserver>();
+	  private List<IGameEventObserver> _observers = new List<IGameEventObserver>();
 
 	public static GameEventSystem Instance
 	{
@@ -149,7 +149,7 @@ public partial class GameEventSystem : Node
 		}
 	}
 
-	public void AddObserver(IGameEventObserver observer)
+	  public void AddObserver(IGameEventObserver observer)
 	{
 		if (!_observers.Contains(observer))
 		{
@@ -163,7 +163,7 @@ public partial class GameEventSystem : Node
 	}
 
 	public void NotifyObservers(GameEvent gameEvent)
-	{
+	 {
 		foreach (var observer in _observers.ToArray())
 		{
 			observer.OnGameEvent(gameEvent);

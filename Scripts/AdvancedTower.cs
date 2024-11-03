@@ -1,11 +1,11 @@
 using Godot;
 using System;
 
-public partial class AdvancedTower : Tower
+	public partial class AdvancedTower : Tower
 {
 	protected override void InitializeTower()
 	{
-		_damage = 100;
+			_damage = 100;
 		_range = 150;
 		_attackSpeed = 0.8f;
 		_cost = 150;

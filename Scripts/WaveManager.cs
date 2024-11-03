@@ -15,7 +15,6 @@ public partial class WaveManager : Node
 	private bool _isWaitingForNextWave = false;
 	private Node2D _enemiesContainer;
 	private PackedScene _enemyScene;
-	private PackedScene _fastEnemyScene;
 	private Random _random = new Random();
 	private float _initialDelay = 3.0f;
 	private float _initialTimer = 0f;
@@ -25,7 +24,6 @@ public partial class WaveManager : Node
 	public override void _Ready()
 	{
 		_enemyScene = GD.Load<PackedScene>("res://Scenes/Enemy.tscn");
-		_fastEnemyScene = GD.Load<PackedScene>("res://Scenes/FastEnemy.tscn");
 		_enemiesContainer = GetNode<Node2D>("/root/Main/EnemiesContainer");
 		_gameStarted = false;
 		_initialTimer = 0f;
@@ -104,31 +102,45 @@ public partial class WaveManager : Node
 	{
 		float difficultyMultiplier = 1 + ((_currentWave - 1) * 0.25f);
 		bool isElite = _currentWave >= 2 && _random.NextDouble() < 0.3;
-		bool isFastEnemy = _random.NextDouble() < 0.4;
-		IMovementStrategy movementStrategy = _random.NextDouble() < 0.5 ? new ZigZagMovement() : new StraightLineMovement();
+		bool isFast = !isElite && _random.NextDouble() < 0.4;
+		IMovementStrategy movementStrategy = _random.NextDouble() < 0.5 ? 
+			new ZigZagMovement() : new StraightLineMovement();
 
-		Enemy enemy;
-		if (isFastEnemy)
+		Enemy enemy = _enemyScene.Instantiate<Enemy>();
+		
+		if (isElite)
 		{
-			enemy = _fastEnemyScene.Instantiate<FastEnemy>();
+			enemy.Initialize(
+				health: (int)(200 * difficultyMultiplier),
+				damage: (int)(20 * difficultyMultiplier),
+				speed: 60,
+				goldReward: 75,
+				isElite: true,
+				isFast: false,
+				movementStrategy: new ZigZagMovement()
+			);
+		}
+		else if (isFast)
+		{
 			enemy.Initialize(
 				health: (int)(80 * difficultyMultiplier),
 				damage: (int)(15 * difficultyMultiplier),
 				speed: 120,
 				goldReward: 50,
 				isElite: false,
-				movementStrategy: movementStrategy
+				isFast: true,
+				movementStrategy: new StraightLineMovement()
 			);
 		}
 		else
 		{
-			enemy = _enemyScene.Instantiate<Enemy>();
 			enemy.Initialize(
-				health: (int)((isElite ? 200 : 100) * difficultyMultiplier),
-				damage: (int)((isElite ? 20 : 10) * difficultyMultiplier),
-				speed: isElite ? 60 : 80,
-				goldReward: isElite ? 75 : 25,
-				isElite: isElite,
+				health: (int)(100 * difficultyMultiplier),
+				damage: (int)(10 * difficultyMultiplier),
+				speed: 80,
+				goldReward: 25,
+				isElite: false,
+				isFast: false,
 				movementStrategy: movementStrategy
 			);
 		}

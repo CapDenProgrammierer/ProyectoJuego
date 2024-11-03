@@ -12,12 +12,12 @@ public class SingleTargetAttack : IAttackStrategy
 	public void Attack(Tower tower, Enemy target)
 	{
 		var projectile = Tower.ProjectileScene.Instantiate<Projectile>();
-		if (projectile != null)
+		 if (projectile != null)
 		{
-			GD.Print("Creando proyectil de ataque simple");
+			 GD.Print("Creando proyectil de ataque simple");
 			tower.GetTree().Root.AddChild(projectile);
 			projectile.GlobalPosition = tower.GlobalPosition;
-			projectile.Initialize(target, tower.Damage);
+			 projectile.Initialize(target, tower.Damage);
 		}
 		else
 		{
