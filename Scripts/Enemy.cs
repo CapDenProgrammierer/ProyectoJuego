@@ -1,13 +1,10 @@
 using Godot;
 using System;
 
-using Godot;
-using System;
-
 public partial class Enemy : Node2D, IGameUnit
 {
 	private float _baseSpeed;
-		private float _currentSpeed;
+	private float _currentSpeed;
 	private int _health;
 	private int _maxHealth;
 	private int _damage;
@@ -26,26 +23,26 @@ public partial class Enemy : Node2D, IGameUnit
 	
 	public bool IsDying => _isDying;
 	public float BaseSpeed => _baseSpeed;
-		public float CurrentSpeed 
+	public float CurrentSpeed 
 	{ 
 		get => _currentSpeed;
 		set => _currentSpeed = value;
 	}
 	public float EndXPosition => _endXPosition;
-		public int Damage => _damage;
+	public int Damage => _damage;
 	public int GoldReward => _goldReward;
 	public bool IsAlive => _health > 0 && !_isDying;
 	public float SlowMultiplier
 	{
 		get => _slowMultiplier;
-			set => _slowMultiplier = value;
+		set => _slowMultiplier = value;
 	}
 
 	public void Initialize(int health, int damage, float speed, int goldReward, bool isElite, bool isFast = false, IMovementStrategy movementStrategy = null)
 	{
 		_health = health;
 		_maxHealth = health;
-			_damage = damage;
+		_damage = damage;
 		_baseSpeed = speed;
 		_currentSpeed = speed;
 		_goldReward = goldReward;
@@ -53,7 +50,7 @@ public partial class Enemy : Node2D, IGameUnit
 		_isFast = isFast;
 		_hasStartedMoving = false;
 		_isDying = false;
-			_movementStrategy = movementStrategy ?? new StraightLineMovement();
+		_movementStrategy = movementStrategy ?? new StraightLineMovement();
 		ChangeState(new MovingState());
 	}
 
@@ -62,12 +59,12 @@ public partial class Enemy : Node2D, IGameUnit
 		if (_isDying) return;
 		
 		_health -= (int)damage;
-			UpdateHealthBar();
+		UpdateHealthBar();
 		
 		if (_health <= 0 && _currentState is not DyingState)
 		{
 			_isDying = true;
-				RemoveFromGroup("Enemies");
+			RemoveFromGroup("Enemies");
 			ChangeState(new DyingState());
 		}
 	}
@@ -75,7 +72,7 @@ public partial class Enemy : Node2D, IGameUnit
 	public void ApplySlow(float slowAmount, float duration)
 	{
 		if (_isDying) return;
-			_slowMultiplier = Mathf.Min(_slowMultiplier, 1f - slowAmount);
+		_slowMultiplier = Mathf.Min(_slowMultiplier, 1f - slowAmount);
 		ChangeState(new SlowedState(_currentState, duration));
 	}
 
@@ -83,29 +80,28 @@ public partial class Enemy : Node2D, IGameUnit
 	{
 		_currentState?.Exit(this);
 		_currentState = newState;
-			_currentState.Enter(this);
+		_currentState.Enter(this);
 	}
 
 	public override void _Ready()
 	{
 		AddToGroup("Enemies");
-			InitializeVisuals();
+		InitializeVisuals();
 		UnitManager.Instance?.RegisterEnemy(this);
 		GlobalPosition = _startPosition;
 		_hasStartedMoving = true;
 	}
 
-   protected virtual void InitializeVisuals()
+	protected virtual void InitializeVisuals()
 	{
 		_sprite = new Sprite2D();
 		_sprite.ZIndex = 0;
 		AddChild(_sprite);
 
-
-			_healthBar = new ColorRect();
+		_healthBar = new ColorRect();
 		_healthBar.Size = new Vector2(_isElite || !_isFast ? 32 : 24, 4);
 		_healthBar.Position = new Vector2(_isElite || !_isFast ? -16 : -12, _isElite || !_isFast ? -24 : -20);
-			_healthBar.Color = Colors.Green;
+		_healthBar.Color = Colors.Green;
 		_healthBar.ZIndex = 1;
 		AddChild(_healthBar);
 
@@ -113,7 +109,7 @@ public partial class Enemy : Node2D, IGameUnit
 		{
 			var eliteIndicator = new ColorRect();
 			eliteIndicator.Size = new Vector2(16, 8);
-				eliteIndicator.Position = new Vector2(-8, -28);
+			eliteIndicator.Position = new Vector2(-8, -28);
 			eliteIndicator.Color = Colors.Yellow;
 			eliteIndicator.ZIndex = 2;
 			AddChild(eliteIndicator);
@@ -135,60 +131,45 @@ public partial class Enemy : Node2D, IGameUnit
 
 	private void CreateNormalSprite()
 	{
-			var texture = GD.Load<Texture2D>("res://Assets/Imagenes/Enemigo1.png");
+		var texture = GD.Load<Texture2D>("res://Assets/Imagenes/Enemigo1.png");
 		if (texture != null)
 		{
 			_sprite.Texture = texture;
 			float scale = 32.0f / texture.GetWidth();
-				_sprite.Scale = new Vector2(scale, scale);
-		}
-		else
-		{
-			GD.PrintErr("No se pudo cargar la imagen del enemigo normal");
+			_sprite.Scale = new Vector2(scale, scale);
 		}
 	}
 
 	private void CreateFastSprite()
 	{
-			var texture = GD.Load<Texture2D>("res://Assets/Imagenes/Enemigo2.png");
+		var texture = GD.Load<Texture2D>("res://Assets/Imagenes/Enemigo2.png");
 		if (texture != null)
 		{
 			_sprite.Texture = texture;
 			float scale = 24.0f / texture.GetWidth();
-			 	_sprite.Scale = new Vector2(scale, scale);
-		}
-		else
-		{
-			GD.PrintErr("No se pudo cargar la imagen del enemigo rápido");
-
+			_sprite.Scale = new Vector2(scale, scale);
 		}
 	}
 
 	private void CreateEliteSprite()
 	{
-		  var texture = GD.Load<Texture2D>("res://Assets/Imagenes/Enemigo3.png");
-			if (texture != null)
+		var texture = GD.Load<Texture2D>("res://Assets/Imagenes/Enemigo3.png");
+		if (texture != null)
 		{
 			_sprite.Texture = texture;
-				float scale = 32.0f / texture.GetWidth();
+			float scale = 32.0f / texture.GetWidth();
 			_sprite.Scale = new Vector2(scale, scale);
-		}
-		else
-		{
-			GD.PrintErr("No se pudo cargar la imagen del enemigo elite");
-	
 		}
 	}
 
-
-	 public override void _ExitTree()
+	public override void _ExitTree()
 	{
 		UnitManager.Instance?.UnregisterEnemy(this);
 	}
 
 	private void UpdateHealthBar()
 	{
-		 if (_healthBar != null)
+		if (_healthBar != null)
 		{
 			float healthPercentage = (float)_health / _maxHealth;
 			float baseWidth = _isElite || !_isFast ? 32 : 24;
@@ -197,7 +178,7 @@ public partial class Enemy : Node2D, IGameUnit
 		}
 	}
 	
- 	  public new Vector2 GetPosition()
+	public Vector2 GetPosition()
 	{
 		return GlobalPosition;
 	}
@@ -206,22 +187,32 @@ public partial class Enemy : Node2D, IGameUnit
 	{
 		_currentState?.Update(this, delta);
 	}
-
-	public void UpdateUnit(double delta)
+	
+ public void ApplyEffect(IEffect effect)
 	{
-		 if (_movementStrategy != null && !_isDying)
-		{
-			Vector2 movement = _movementStrategy.GetMovement(this, (float)delta);
-			Position += movement;
-		}
-		 _currentState?.Update(this, delta);
-	}
-
-	public void ApplyEffect(IEffect effect)
-	{
-		 if (!_isDying)
+		if (!_isDying)
 		{
 			effect.Apply(this);
 		}
+	}
+
+	public void UpdateUnit(double delta)
+	{
+		if (_movementStrategy != null && !_isDying)
+		{
+			Vector2 movement = _movementStrategy.GetMovement(this, (float)delta);
+			Position += movement;
+			
+			// Debug para verificar el movimiento
+			if (Mathf.Abs(movement.Y) > 0.1f)
+			{
+				GD.Print($"Enemy movement - X: {movement.X:F2}, Y: {movement.Y:F2}");
+			}
+		}
+	}
+	public override void _PhysicsProcess(double delta)
+	{
+		// Aseguramos que el movimiento se procese en el physics frame
+		UpdateUnit(delta);
 	}
 }

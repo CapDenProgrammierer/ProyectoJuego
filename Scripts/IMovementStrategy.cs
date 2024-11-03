@@ -1,14 +1,14 @@
 using Godot;
 using System;
 
-public interface IMovementStrategy
+public interface IMovementStrategy 
 {
 	Vector2 GetMovement(Enemy enemy, float delta);
 }
 
-public class StraightLineMovement : IMovementStrategy
+public class StraightLineMovement : IMovementStrategy 
 {
-	public Vector2 GetMovement(Enemy enemy, float delta)
+	public Vector2 GetMovement(Enemy enemy, float delta) 
 	{
 		return new Vector2(enemy.CurrentSpeed * delta, 0);
 	}
@@ -16,14 +16,20 @@ public class StraightLineMovement : IMovementStrategy
 
 public class ZigZagMovement : IMovementStrategy
 {
-	private float _amplitude = 100f;
-	private float _frequency = 2f;
+	public float Amplitude { get; set; } = 150f;
+	public float Frequency { get; set; } = 1.0f;
 	private float _timePassed = 0f;
 
 	public Vector2 GetMovement(Enemy enemy, float delta)
 	{
 		_timePassed += delta;
-		float verticalOffset = Mathf.Cos(_timePassed * _frequency) * _amplitude * delta;
-		return new Vector2(enemy.CurrentSpeed * delta, verticalOffset);
+		
+		// Movimiento horizontal normal
+		float horizontalMove = enemy.CurrentSpeed * delta;
+		
+		// Movimiento vertical más suave
+		float verticalMove = Mathf.Sin(_timePassed * Frequency * Mathf.Pi) * Amplitude * delta;
+		
+		return new Vector2(horizontalMove, verticalMove);
 	}
 }
