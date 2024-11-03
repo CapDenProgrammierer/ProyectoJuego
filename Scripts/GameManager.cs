@@ -4,14 +4,11 @@ using System.Collections.Generic;
 
 public partial class GameManager : Node
 {
-	// Singleton
 	private static GameManager _instance;
 	public static GameManager Instance
-
 	{
 		get { return _instance; }
 	}
-
 
 	private GameUI _gameUI;
 	private GameOverScreen _gameOverScreen;
@@ -19,24 +16,15 @@ public partial class GameManager : Node
 	private bool _isPaused = false;
 	public bool IsPaused => _isPaused;
 
-
-	// Estado del juego
 	private int _gold = 100;
 	private int _lives = 20;
 	private int _score = 0;
 	private bool _isGameOver = false;
 
-	// Propiedades públicas
 	public int Gold { get { return _gold; } }
 	public int Lives { get { return _lives; } }
 	public int Score { get { return _score; } }
 	public bool IsGameOver { get { return _isGameOver; } }
-
-	// Sistema de eventos
-	public delegate void GameStateChangedHandler();
-	public event GameStateChangedHandler OnGoldChanged;
-	public event GameStateChangedHandler OnLivesChanged;
-	public event GameStateChangedHandler OnGameOver;
 
 	public override void _EnterTree()
 	{
@@ -46,130 +34,86 @@ public partial class GameManager : Node
 		}
 	}
 
-	public override void _Ready()
+	  public override void _Ready()
 	{
-		// Obtener referencias a nodos necesarios
 		_gameUI = GetNode<GameUI>("/root/Main/UI/GameUI");
 		_waveManager = GetNode<WaveManager>("/root/Main/WaveManager");
 		
-		// Crear y configurar la pantalla de Game Over
 		_gameOverScreen = new GameOverScreen();
 		GetNode<CanvasLayer>("/root/Main/UI").AddChild(_gameOverScreen);
 
-		GD.Print("=== Nuevo Juego Iniciado ===");
-		GD.Print($"Oro inicial: {_gold}");
-		GD.Print($"Vidas iniciales: {_lives}");
+		GameEventSystem.Instance?.AddObserver(new GameManagerObserver(this));
+
+		GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(
+			ResourceType.Gold,
+			0,
+			_gold
+		));
+		
+		GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(
+			ResourceType.Lives,
+			0,
+			_lives
+		));
 	}
 
- public override void _UnhandledInput(InputEvent @event)
+	  private class GameManagerObserver : IGameEventObserver
+	{
+		private readonly GameManager _gameManager;
+
+		public GameManagerObserver(GameManager gameManager)
+		{
+			_gameManager = gameManager;
+		}
+
+		public void OnGameEvent(GameEvent gameEvent)
+		{
+			switch (gameEvent)
+			{
+				case EnemyEvent enemyEvent:
+					if (enemyEvent.Type == EnemyEventType.Killed)
+					{
+						_gameManager.AddGold(enemyEvent.Reward);
+					}
+					else if (enemyEvent.Type == EnemyEventType.ReachedEnd)
+					{
+						GD.Print("Enemigo alcanzó la base"); 
+					}
+					break;
+
+				case TowerEvent towerEvent:
+					if (towerEvent.Type == TowerEventType.Sold)
+					{
+						_gameManager.AddGold(towerEvent.Cost);
+					}
+					break;
+			}
+		}
+	}
+
+	 public override void _UnhandledInput(InputEvent @event)
 	{
 		if (_isGameOver && @event.IsPressed())
 		{
-			// Si el juego terminó y se presiona cualquier tecla o botón
 			if (@event is InputEventKey || @event is InputEventMouseButton)
 			{
+				GD.Print("Input detectado durante Game Over, reiniciando juego"); 
 				RestartGame();
 			}
 		}
 	}
 
-	// Métodos para gestionar el oro
-	public bool SpendGold(int amount)
-	{
-		if (_isGameOver) return false;
-
-		if (_gold >= amount)
-		{
-			_gold -= amount;
-			OnGoldChanged?.Invoke();
-			ShowMessage($"Oro gastado: -{amount}");
-			return true;
-		}
-		
-		ShowMessage("No hay suficiente oro");
-		return false;
-	}
-
-	public void AddGold(int amount)
-	{
-		if (_isGameOver) return;
-
-		_gold += amount;
-		_score += amount; // El oro ganado suma al puntaje
-		OnGoldChanged?.Invoke();
-		ShowMessage($"¡+{amount} oro!");
-	}
-
-	// Métodos para gestionar las vidas
-	public void TakeDamage(int damage)
-	{
-		if (_isGameOver) return;
-
-		_lives -= damage;
-		OnLivesChanged?.Invoke();
-		
-		ShowMessage($"¡Base dañada! -{damage} vidas");
-		GD.Print($"Daño recibido: {damage}. Vidas restantes: {_lives}");
-
-		if (_lives <= 0)
-		{
-			_lives = 0;
-			GameOver();
-		}
-	}
-
-	public void AddLives(int amount)
-	{
-		if (_isGameOver) return;
-
-		_lives += amount;
-		OnLivesChanged?.Invoke();
-		ShowMessage($"¡+{amount} vidas!");
-	}
-
-	// Método para mostrar mensajes
 	public void ShowMessage(string message)
 	{
-		if (_gameUI != null)
-		{
-			_gameUI.ShowMessage(message);
-		}
+		GameEventSystem.Instance?.NotifyObservers(new MessageEvent(message));
 	}
 
-	// Gestión del Game Over
-	 private void GameOver()
+	 private void SetGamePaused(bool paused)
 	{
-		if (_isGameOver) return;
-
-		_isGameOver = true;
-		ShowMessage("¡Game Over!");
-		
-		// Disparar evento de Game Over
-		OnGameOver?.Invoke();
-		
-		// Mostrar pantalla de Game Over antes de pausar
-		if (_gameOverScreen != null)
-		{
-			int currentWave = _waveManager != null ? _waveManager.CurrentWave : 0;
-			_gameOverScreen.Show(currentWave, _gold);
-			
-			// Usar CallDeferred para pausar en el próximo frame
-			CallDeferred("SetGamePaused", true);
-		}
-		
-		// Registrar estadísticas finales
-		GD.Print("=== GAME OVER ===");
-		GD.Print($"Oleada alcanzada: {_waveManager?.CurrentWave}");
-		GD.Print($"Oro final: {_gold}");
-		GD.Print($"Puntuación final: {_score}");
-	}
-
- private void SetGamePaused(bool paused)
-	{
+		GD.Print($"Estableciendo pausa: {paused}"); 
 		_isPaused = paused;
 		GetTree().Paused = paused;
 		
-		// Asegurarnos de que la UI y la pantalla de Game Over no se vean afectadas por la pausa
 		if (_gameUI != null)
 		{
 			_gameUI.ProcessMode = paused ? Node.ProcessModeEnum.Always : Node.ProcessModeEnum.Inherit;
@@ -181,10 +125,156 @@ public partial class GameManager : Node
 		}
 	}
 
-	// Método para reiniciar el juego
-	 public void RestartGame()
+	public bool SpendGold(int amount)
 	{
-		// Primero desactivamos la pausa
+		if (_isGameOver) return false;
+
+		if (_gold >= amount)
+		{
+			int previousGold = _gold;
+			_gold -= amount;
+			GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(
+				ResourceType.Gold, 
+				previousGold, 
+				_gold
+			));
+			return true;
+		}
+		
+		ShowMessage("No hay suficiente oro");
+		return false;
+	}
+
+	 public void TakeDamage(int damage)
+{
+	if (_isGameOver) return;
+
+	int previousLives = _lives;
+	_lives -= damage;
+
+	VisualEffectSystem.Instance?.CreateBaseHitEffect(new Vector2(1100, 300));
+	
+	GameEventSystem.Instance?.NotifyObservers(new MessageEvent(
+		$"¡La base recibió {damage} de daño! Vidas restantes: {_lives}"
+	));
+
+	GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(
+		ResourceType.Lives,
+		previousLives,
+		_lives
+	));
+
+	if (_lives <= 0)
+	{
+		_lives = 0;
+		CallDeferred(nameof(InitiateGameOver));
+	}
+}
+
+	private void InitiateGameOver()
+	{
+		if (_isGameOver) return;
+
+		_isGameOver = true;
+		
+		if (_gameOverScreen == null)
+		{
+			_gameOverScreen = new GameOverScreen();
+			GetNode<CanvasLayer>("/root/Main/UI").AddChild(_gameOverScreen);
+		}
+
+		int currentWave = _waveManager != null ? _waveManager.CurrentWave : 0;
+		
+		_gameOverScreen.Show(currentWave, _gold);
+		_gameOverScreen.Visible = true;
+		_gameOverScreen.ZIndex = 999;
+
+		GameEventSystem.Instance?.NotifyObservers(new MessageEvent(
+			"¡GAME OVER! Presiona cualquier tecla para reiniciar"
+		));
+
+		GameEventSystem.Instance?.NotifyObservers(new GameOverEvent(
+			currentWave,
+			_gold,
+			_score
+		));
+
+		SetGamePaused(true);
+	}
+	public void AddLives(int amount)
+	{
+		if (_isGameOver) return;
+
+		int previousLives = _lives;
+		_lives += amount;
+		
+		GameEventSystem.Instance.NotifyObservers(new ResourceEvent(
+			ResourceType.Lives,
+			previousLives,
+			_lives
+		));
+	}
+
+public void AddGold(int amount)
+	{
+		if (_isGameOver) return;
+
+		int previousGold = _gold;
+		int previousScore = _score;
+		
+		_gold += amount;
+		_score += amount;
+
+		GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(
+			ResourceType.Gold,
+			previousGold,
+			_gold
+		));
+
+		GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(
+			ResourceType.Score,
+			previousScore,
+			_score
+		));
+	}
+
+	  private void GameOver()
+	{
+		if (_isGameOver) return;
+
+		_isGameOver = true;
+		GD.Print("Game Over activado"); 
+		
+		if (_gameOverScreen != null)
+		{
+			int currentWave = _waveManager != null ? _waveManager.CurrentWave : 0;
+			_gameOverScreen.Show(currentWave, _gold);
+			
+			
+			_gameOverScreen.Visible = true;
+			_gameOverScreen.ZIndex = 100; 
+			
+			CallDeferred(nameof(SetGamePaused), true);
+		}
+		else
+		{
+			GD.PrintErr("_gameOverScreen es null"); 
+		}
+
+		GameEventSystem.Instance?.NotifyObservers(new GameOverEvent(
+			_waveManager?.CurrentWave ?? 0,
+			_gold,
+			_score
+		));
+		
+		GD.Print("=== GAME OVER ===");
+		GD.Print($"Oleada alcanzada: {_waveManager?.CurrentWave}");
+		GD.Print($"Oro final: {_gold}");
+		GD.Print($"Puntuación final: {_score}");
+	}
+	
+	public void RestartGame()
+	{
 		SetGamePaused(false);
 		
 		_isGameOver = false;
@@ -192,22 +282,20 @@ public partial class GameManager : Node
 		_lives = 20;
 		_score = 0;
 		
-		// Recargar la escena actual
 		GetTree().ReloadCurrentScene();
 		
 		GD.Print("=== Juego Reiniciado ===");
 	}
 
-	// Método para salir del juego
 	public void QuitGame()
 	{
 		GetTree().Quit();
 	}
-	 public override void _Notification(int what)
+
+	public override void _Notification(int what)
 	{
 		if (what == NotificationApplicationResumed)
 		{
-			// Si la aplicación vuelve al primer plano, asegurarse de que la UI sea visible
 			if (_gameUI != null)
 			{
 				_gameUI.ProcessMode = Node.ProcessModeEnum.Always;

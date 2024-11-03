@@ -7,22 +7,21 @@ public class MovingState : IEnemyState
 	
 	public void Enter(Enemy enemy)
 	{
-		_pathProgress = 0;
 		enemy.CurrentSpeed = enemy.BaseSpeed * enemy.SlowMultiplier;
 	}
 	
 	public void Exit(Enemy enemy) { }
 	
-	public void Update(Enemy enemy, double delta)
+	   public void Update(Enemy enemy, double delta)
 	{
 		if (!enemy.IsAlive) 
 		{
 			enemy.ChangeState(new DyingState());
 			return;
 		}
-		
-		_pathProgress += enemy.CurrentSpeed * (float)delta;
-		enemy.Position += Vector2.Right * enemy.CurrentSpeed * (float)delta;
+
+		Vector2 movement = new Vector2(enemy.CurrentSpeed * (float)delta, 0);
+		enemy.Position += movement;
 		
 		if (enemy.Position.X >= enemy.EndXPosition)
 		{
@@ -39,10 +38,16 @@ public class DyingState : IEnemyState
 	public void Enter(Enemy enemy)
 	{
 		enemy.CurrentSpeed = 0;
-		if (GameManager.Instance != null)
-		{
-			GameManager.Instance.AddGold(enemy.GoldReward);
-		}
+		
+		GameEventSystem.Instance?.NotifyObservers(new EnemyEvent(
+			EnemyEventType.Killed,
+			enemy.GlobalPosition,
+			enemy.GoldReward
+		));
+
+		GameEventSystem.Instance?.NotifyObservers(new MessageEvent(
+			$"¡Enemigo eliminado! +{enemy.GoldReward} oro"
+		));
 	}
 	
 	public void Exit(Enemy enemy) { }
@@ -61,23 +66,41 @@ public class DyingState : IEnemyState
 
 public class ReachedEndState : IEnemyState
 {
+	private float _damageDelay = 0.5f; 
+	private float _currentDelay = 0f;
+	private bool _hasDamaged = false;
+
 	public void Enter(Enemy enemy)
 	{
 		enemy.CurrentSpeed = 0;
-		if (GameManager.Instance != null)
-		{
-			GameManager.Instance.TakeDamage(enemy.Damage);
-		}
+		_hasDamaged = false;
 	}
 	
 	public void Exit(Enemy enemy) { }
 	
 	public void Update(Enemy enemy, double delta)
 	{
-		enemy.QueueFree();
+		if (!_hasDamaged)
+		{
+			_currentDelay += (float)delta;
+			
+			if (_currentDelay >= _damageDelay)
+			{
+				GameEventSystem.Instance?.NotifyObservers(new MessageEvent(
+					$"¡Un enemigo alcanzó la base! -{enemy.Damage} vidas"
+				));
+
+				if (GameManager.Instance != null)
+				{
+					GameManager.Instance.TakeDamage(enemy.Damage);
+				}
+				
+				_hasDamaged = true;
+				enemy.QueueFree();
+			}
+		}
 	}
 }
-
 public class SlowedState : IEnemyState
 {
 	private IEnemyState _previousState;

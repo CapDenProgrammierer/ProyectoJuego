@@ -2,10 +2,11 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public partial class GameUI : Control
+public partial class GameUI : Control, IGameEventObserver
 {
 	private Label _goldLabel;
 	private Label _livesLabel;
+	private Label _scoreLabel;
 	private Label _messageLabel;
 	private VBoxContainer _messageContainer;
 	private List<Label> _messagePool;
@@ -15,11 +16,16 @@ public partial class GameUI : Control
 	{
 		CreateTopHUD();
 		CreateMessageSystem();
+		GameEventSystem.Instance.AddObserver(this);
+	}
+
+	public override void _ExitTree()
+	{
+		GameEventSystem.Instance.RemoveObserver(this);
 	}
 
 	private void CreateTopHUD()
 	{
-		// Panel superior para recursos
 		var topPanel = new PanelContainer();
 		topPanel.SetAnchorsPreset(Control.LayoutPreset.TopWide);
 		AddChild(topPanel);
@@ -28,7 +34,6 @@ public partial class GameUI : Control
 		topContainer.CustomMinimumSize = new Vector2(0, 40);
 		topPanel.AddChild(topContainer);
 
-		// Contenedor para el oro
 		var goldContainer = new HBoxContainer();
 		_goldLabel = new Label();
 		_goldLabel.AddThemeColorOverride("font_color", Colors.Yellow);
@@ -36,12 +41,10 @@ public partial class GameUI : Control
 		goldContainer.AddChild(_goldLabel);
 		topContainer.AddChild(goldContainer);
 
-		// Espaciador
-		var spacer = new Control();
-		spacer.SizeFlagsHorizontal = Control.SizeFlags.Expand;
-		topContainer.AddChild(spacer);
+		var spacer1 = new Control();
+		spacer1.SizeFlagsHorizontal = Control.SizeFlags.Expand;
+		topContainer.AddChild(spacer1);
 
-		// Contenedor para las vidas
 		var livesContainer = new HBoxContainer();
 		_livesLabel = new Label();
 		_livesLabel.AddThemeColorOverride("font_color", Colors.Red);
@@ -49,7 +52,17 @@ public partial class GameUI : Control
 		livesContainer.AddChild(_livesLabel);
 		topContainer.AddChild(livesContainer);
 
-		// Agregar padding
+		var spacer2 = new Control();
+		spacer2.SizeFlagsHorizontal = Control.SizeFlags.Expand;
+		topContainer.AddChild(spacer2);
+
+		var scoreContainer = new HBoxContainer();
+		_scoreLabel = new Label();
+		_scoreLabel.AddThemeColorOverride("font_color", Colors.White);
+		_scoreLabel.AddThemeFontSizeOverride("font_size", 24);
+		scoreContainer.AddChild(_scoreLabel);
+		topContainer.AddChild(scoreContainer);
+
 		topContainer.AddThemeConstantOverride("margin_left", 20);
 		topContainer.AddThemeConstantOverride("margin_right", 20);
 		topContainer.AddThemeConstantOverride("margin_top", 10);
@@ -58,14 +71,12 @@ public partial class GameUI : Control
 
 	private void CreateMessageSystem()
 	{
-		// Contenedor para mensajes
 		_messageContainer = new VBoxContainer();
 		_messageContainer.SetAnchorsPreset(Control.LayoutPreset.CenterRight);
-		_messageContainer.Position = new Vector2(-400, -200); // Ajusta según necesites
+		_messageContainer.Position = new Vector2(-400, -200);
 		_messageContainer.CustomMinimumSize = new Vector2(300, 0);
 		AddChild(_messageContainer);
 
-		// Inicializar pool de mensajes
 		_messagePool = new List<Label>();
 		for (int i = 0; i < MESSAGE_POOL_SIZE; i++)
 		{
@@ -78,18 +89,104 @@ public partial class GameUI : Control
 		}
 	}
 
-	public override void _Process(double delta)
+	public void OnGameEvent(GameEvent gameEvent)
 	{
-		if (GameManager.Instance != null)
+		switch (gameEvent)
 		{
-			_goldLabel.Text = $"Oro: {GameManager.Instance.Gold}";
-			_livesLabel.Text = $"Vidas: {GameManager.Instance.Lives}";
+			case ResourceEvent resourceEvent:
+				HandleResourceEvent(resourceEvent);
+				break;
+			case WaveEvent waveEvent:
+				HandleWaveEvent(waveEvent);
+				break;
+			case TowerEvent towerEvent:
+				HandleTowerEvent(towerEvent);
+				break;
+			case EnemyEvent enemyEvent:
+				HandleEnemyEvent(enemyEvent);
+				break;
+		}
+	}
+
+	private void HandleResourceEvent(ResourceEvent evt)
+	{
+		switch (evt.Type)
+		{
+			case ResourceType.Gold:
+				_goldLabel.Text = $"Oro: {evt.NewAmount}";
+				if (evt.NewAmount < evt.PreviousAmount)
+				{
+					ShowMessage($"Oro gastado: -{evt.PreviousAmount - evt.NewAmount}");
+				}
+				else if (evt.NewAmount > evt.PreviousAmount)
+				{
+					ShowMessage($"¡+{evt.NewAmount - evt.PreviousAmount} oro!");
+				}
+				break;
+
+			case ResourceType.Lives:
+				_livesLabel.Text = $"Vidas: {evt.NewAmount}";
+				if (evt.NewAmount < evt.PreviousAmount)
+				{
+					ShowMessage($"¡Base dañada! -{evt.PreviousAmount - evt.NewAmount} vidas");
+				}
+				else if (evt.NewAmount > evt.PreviousAmount)
+				{
+					ShowMessage($"¡+{evt.NewAmount - evt.PreviousAmount} vidas!");
+				}
+				break;
+
+			case ResourceType.Score:
+				_scoreLabel.Text = $"Puntuación: {evt.NewAmount}";
+				break;
+		}
+	}
+
+	private void HandleWaveEvent(WaveEvent evt)
+	{
+		string message = evt.State switch
+		{
+			WaveState.Starting => $"¡Comienza la oleada {evt.WaveNumber}! ({evt.EnemyCount} enemigos)",
+			WaveState.Complete => $"¡Oleada {evt.WaveNumber} completada!",
+			_ => $"Oleada {evt.WaveNumber} en progreso"
+		};
+		ShowMessage(message);
+	}
+
+	private void HandleTowerEvent(TowerEvent evt)
+	{
+		string message = evt.Type switch
+		{
+			TowerEventType.Placed => $"Torre {evt.TowerType} construida (-{evt.Cost} oro)",
+			TowerEventType.Sold => $"Torre vendida (+{evt.Cost} oro)",
+			TowerEventType.Upgraded => $"Torre mejorada (-{evt.Cost} oro)",
+			_ => ""
+		};
+		if (!string.IsNullOrEmpty(message))
+			ShowMessage(message);
+	}
+
+	private void HandleEnemyEvent(EnemyEvent evt)
+	{
+		switch (evt.Type)
+		{
+			case EnemyEventType.Killed:
+				ShowMessage($"¡Enemigo eliminado! +{evt.Reward} oro");
+				break;
+			case EnemyEventType.ReachedEnd:
+				ShowMessage("¡Un enemigo alcanzó la base!");
+				break;
+			case EnemyEventType.Damaged:
+				if (evt.HealthPercentage <= 0.25f)
+				{
+					ShowMessage("¡Enemigo casi derrotado!");
+				}
+				break;
 		}
 	}
 
 	public void ShowMessage(string message)
 	{
-		// Mover mensajes existentes hacia arriba
 		for (int i = 0; i < _messagePool.Count - 1; i++)
 		{
 			if (_messagePool[i + 1].Visible)
@@ -104,13 +201,11 @@ public partial class GameUI : Control
 			}
 		}
 
-		// Mostrar nuevo mensaje en la última posición
 		var lastLabel = _messagePool[_messagePool.Count - 1];
 		lastLabel.Text = message;
 		lastLabel.Modulate = Colors.White;
 		lastLabel.Visible = true;
 
-		// Crear y empezar el timer para desvanecer el mensaje
 		var timer = GetTree().CreateTimer(2.0);
 		timer.Timeout += () => StartFadeOut(lastLabel);
 	}

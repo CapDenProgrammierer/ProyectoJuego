@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cam0bif85v20e"
-path="res://.godot/imported/Eemigo2.png-0b28bf7e96ea01e7e110c54c6cee8269.ctex"
+uid="uid://c1cbiv1c1ljke"
+path="res://.godot/imported/Torreta 2.png-9dee361f016cdf4aff2ba42d014bd25c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Imagenes/Eemigo2.png"
-dest_files=["res://.godot/imported/Eemigo2.png-0b28bf7e96ea01e7e110c54c6cee8269.ctex"]
+source_file="res://Assets/Imagenes/Torreta 2.png"
+dest_files=["res://.godot/imported/Torreta 2.png-9dee361f016cdf4aff2ba42d014bd25c.ctex"]
 
 [params]
 

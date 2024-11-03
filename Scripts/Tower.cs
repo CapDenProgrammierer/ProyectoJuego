@@ -64,16 +64,6 @@ public partial class Tower : Node2D
 		return GlobalPosition;
 	}
 
-	public void TakeDamage(float damage)
-	{
-		// Las torres podrían implementar daño en el futuro
-	}
-
-	public void ApplyEffect(IEffect effect)
-	{
-		// Las torres podrían tener sus propios efectos en el futuro
-	}
-
 	public override void _Ready()
 	{
 		if (!_initialized)

@@ -27,9 +27,9 @@ public partial class GameMain : Node2D
 	private void CreateEndZone()
 	{
 		_endZone = new ColorRect();
-		_endZone.Size = new Vector2(20, 600); // Ajusta según el tamaño de tu mapa
-		_endZone.Position = new Vector2(800, 0); // Misma X que _endXPosition en Enemy
-		_endZone.Color = new Color(1, 0, 0, 0.3f); // Rojo semitransparente
+		_endZone.Size = new Vector2(20, 600); 
+		_endZone.Position = new Vector2(1100, 0); 
+		_endZone.Color = new Color(1, 0, 0, 0.3f);
 		AddChild(_endZone);
 	}
 
@@ -96,22 +96,24 @@ public partial class GameMain : Node2D
 	}
 
 	private void TryPlaceTower(Vector2 position)
+{
+	Tower tower = _towerFactory.CreateTower(_selectedTowerType);
+	if (tower == null) return;
+
+	if (GameManager.Instance.SpendGold(tower.Cost))
 	{
-		Tower tower = _towerFactory.CreateTower(_selectedTowerType);
-		if (tower == null) return;
+		_towersContainer.AddChild(tower);
+		tower.Position = position;
 
-		if (GameManager.Instance.SpendGold(tower.Cost))
-		{
-			_towersContainer.AddChild(tower);
-			tower.Position = position;
-		}
-		else
-		{
-			tower.QueueFree();
-		}
+		VisualEffectSystem.Instance?.CreateTowerPlacementEffect(position);
 	}
+	else
+	{
+		tower.QueueFree();
+	}
+}
 
-	private void TrySellTower(Vector2 position)
+	 private void TrySellTower(Vector2 position)
 	{
 		var towers = _towersContainer.GetChildren();
 		
@@ -120,12 +122,19 @@ public partial class GameMain : Node2D
 			if (node is Tower tower)
 			{
 				float distance = position.DistanceTo(tower.Position);
-				if (distance < 32) // Radio de 32 pixels para detectar el click
+				if (distance < 32) 
 				{
 					int sellValue = tower.GetSellValue();
-					GameManager.Instance.AddGold(sellValue);
+
+					GameEventSystem.Instance?.NotifyObservers(new TowerEvent(
+						TowerEventType.Sold,
+						tower.Position,
+						sellValue,
+						tower.GetType().Name
+					));
+
 					tower.QueueFree();
-					GameManager.Instance.ShowMessage($"Torre vendida por {sellValue} oro");
+					
 					return;
 				}
 			}

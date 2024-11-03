@@ -1,10 +1,10 @@
 [gd_scene load_steps=3 format=3 uid="uid://u8mqnjvwm4ak"]
 
 [ext_resource type="Script" path="res://Scripts/AdvancedTower.cs" id="1_n3xrp"]
-[ext_resource type="Texture2D" uid="uid://ci11n63mtd26m" path="res://Assets/Imagenes/Torreta1.png" id="2_sprite"]
+[ext_resource type="Texture2D" uid="uid://c1cbiv1c1ljke" path="res://Assets/Imagenes/Torreta 2.png" id="2_pvly7"]
 
 [node name="AdvancedTower" type="Node2D"]
 script = ExtResource("1_n3xrp")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_sprite")
+texture = ExtResource("2_pvly7")

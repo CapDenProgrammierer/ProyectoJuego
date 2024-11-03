@@ -10,11 +10,14 @@ public partial class Enemy : Node2D, IGameUnit
 	private int _damage;
 	private int _goldReward;
 	private bool _isElite;
-	private ColorRect _healthBar;
-	private float _endXPosition = 800f;
+	protected ColorRect _healthBar;
 	private float _slowMultiplier = 1f;
 	private IEnemyState _currentState;
-	
+	private float _endXPosition = 1100f;
+	protected Vector2 _startPosition = new Vector2(-50, 300);
+	private bool _hasStartedMoving = false;
+	protected IMovementStrategy _movementStrategy;
+
 	public float BaseSpeed => _baseSpeed;
 	public float CurrentSpeed 
 	{ 
@@ -31,7 +34,7 @@ public partial class Enemy : Node2D, IGameUnit
 		set => _slowMultiplier = value;
 	}
 
-	public void Initialize(int health, int damage, float speed, int goldReward, bool isElite)
+	public void Initialize(int health, int damage, float speed, int goldReward, bool isElite, IMovementStrategy movementStrategy = null)
 	{
 		_health = health;
 		_maxHealth = health;
@@ -40,6 +43,8 @@ public partial class Enemy : Node2D, IGameUnit
 		_currentSpeed = speed;
 		_goldReward = goldReward;
 		_isElite = isElite;
+		_hasStartedMoving = false;
+		_movementStrategy = movementStrategy ?? new StraightLineMovement();
 		ChangeState(new MovingState());
 	}
 
@@ -70,16 +75,13 @@ public partial class Enemy : Node2D, IGameUnit
 	public override void _Ready()
 	{
 		AddToGroup("Enemies");
-		CreateVisuals();
+		InitializeVisuals();
 		UnitManager.Instance?.RegisterEnemy(this);
+		GlobalPosition = _startPosition;
+		_hasStartedMoving = true;
 	}
 
-	public override void _ExitTree()
-	{
-		UnitManager.Instance?.UnregisterEnemy(this);
-	}
-
-	private void CreateVisuals()
+	protected virtual void InitializeVisuals()
 	{
 		var body = new ColorRect();
 		body.Size = new Vector2(32, 32);
@@ -103,23 +105,24 @@ public partial class Enemy : Node2D, IGameUnit
 		}
 	}
 
+	public override void _ExitTree()
+	{
+		UnitManager.Instance?.UnregisterEnemy(this);
+	}
+
 	private void UpdateHealthBar()
 	{
 		if (_healthBar != null)
 		{
 			float healthPercentage = (float)_health / _maxHealth;
 			_healthBar.Size = new Vector2(32 * healthPercentage, 4);
-			_healthBar.Color = new Color(
-				1 - healthPercentage,
-				healthPercentage,
-				0
-			);
+			_healthBar.Color = new Color(1 - healthPercentage, healthPercentage, 0);
 		}
 	}
 	
 	public new Vector2 GetPosition()
 	{
-	return GlobalPosition;
+		return GlobalPosition;
 	}
 	
 	public override void _Process(double delta)
@@ -129,9 +132,13 @@ public partial class Enemy : Node2D, IGameUnit
 
 	public void UpdateUnit(double delta)
 	{
+		if (_movementStrategy != null)
+		{
+			Vector2 movement = _movementStrategy.GetMovement(this, (float)delta);
+			Position += movement;
+		}
 		_currentState?.Update(this, delta);
 	}
-
 
 	public void ApplyEffect(IEffect effect)
 	{
