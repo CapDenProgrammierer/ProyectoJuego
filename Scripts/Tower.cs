@@ -5,84 +5,76 @@ using System.Linq;
 
 public partial class Tower : Node2D
 {
-	protected float _damage;
-	protected float _range;
-	protected float _attackSpeed;
-	protected int _cost;
-	protected Color _rangeColor = new Color(0, 1, 0, 0.1f);
+	protected float dmg;
+	protected float range;
+	protected float atkSpeed;
+	protected int cost;
+	protected Color rangeCol = new Color(0, 1, 0, 0.1f);
 	
-	protected float _attackTimer = 0;
-	protected Enemy _currentTarget;
-	private static PackedScene _projectileScene;
-	protected Sprite2D _towerSprite;
-	private RangeIndicator _rangeIndicator;
-	private bool _initialized = false;
-	private bool _isMouseOver = false;
-	protected IAttackStrategy _attackStrategy;
+	protected float timeToNextAttack = 0;
+	protected Enemy target;
+	private static PackedScene projScene;
+	protected Sprite2D sprite;
+	private RangeIndicator rangeInd;
+	private bool init = false;
+	private bool mouseOver = false;
+	protected IAttackStrategy atkStrat;
 
-	public static PackedScene ProjectileScene => _projectileScene;
-	public float Damage => _damage;
+	public static PackedScene ProjectileScene => projScene;
+	public float Damage => dmg;
 
 	public int Cost 
 	{ 
 		get 
 		{
-			if (!_initialized)
-			{
+			if (!init) {
 				InitializeTower();
-				_initialized = true;
+				init = true;
 			}
-			return _cost;
+			return cost;
 		} 
 	}
 
-	public int GetSellValue()
-	{
-		return _cost / 2;
-	}
+	public int GetSellValue() => cost / 2;
 
-	public void UpdateUnit(double delta)
+	public void UpdateUnit(double dt)
 	{
-		_attackTimer += (float)delta;
+		timeToNextAttack += (float)dt;
 
-		if (_currentTarget == null || !IsInstanceValid(_currentTarget) || 
-			!_currentTarget.IsAlive || !IsEnemyInRange(_currentTarget))
+		if (target == null || !IsInstanceValid(target) || 
+			!target.IsAlive || !IsEnemyInRange(target))
 		{
-			_currentTarget = FindNearestEnemy();
+			target = FindNearestEnemy();
 		}
 
-		if (_currentTarget != null && _attackTimer >= _attackSpeed && 
-			IsEnemyInRange(_currentTarget))
+		if (target != null && timeToNextAttack >= atkSpeed && 
+			IsEnemyInRange(target))
 		{
 			Attack();
-			_attackTimer = 0;
+			timeToNextAttack = 0;
 		}
 	}
 
-	public Vector2 GetPosition()
-	{
-		return GlobalPosition;
-	}
+	public Vector2 GetPosition() => GlobalPosition;
 
 	public override void _Ready()
 	{
-		if (!_initialized)
-		{
+		if (!init) {
 			InitializeTower();
-			_initialized = true;
+			init = true;
 		}
 
 		CreateRangeIndicator();
-		_towerSprite = GetNode<Sprite2D>("Sprite2D");
-		if (_towerSprite != null && _towerSprite.Texture != null)
+		sprite = GetNode<Sprite2D>("Sprite2D");
+		if (sprite != null && sprite.Texture != null)
 		{
-			float targetSize = 64.0f;
-			float imageSize = _towerSprite.Texture.GetWidth();
-			float scale = targetSize / imageSize;
-			_towerSprite.Scale = new Vector2(scale, scale);
+			float size = 64.0f;
+			float imgSize = sprite.Texture.GetWidth();
+			float scl = size / imgSize;
+			sprite.Scale = new Vector2(scl, scl);
 		}
 
-		_projectileScene = GD.Load<PackedScene>("res://Scenes/Projectile.tscn");
+		projScene = GD.Load<PackedScene>("res://Scenes/Projectile.tscn");
 		UnitManager.Instance?.RegisterTower(this);
 	}
 
@@ -91,40 +83,32 @@ public partial class Tower : Node2D
 		UnitManager.Instance?.UnregisterTower(this);
 	}
 
-	public override void _Process(double delta)
+	public override void _Process(double dt)
 	{
-		_attackTimer += (float)delta;
+		timeToNextAttack += (float)dt;
 
-		if (_currentTarget == null || !IsInstanceValid(_currentTarget) || !_currentTarget.IsAlive || !IsEnemyInRange(_currentTarget))
+		if (target == null || !IsInstanceValid(target) || !target.IsAlive || !IsEnemyInRange(target))
 		{
-			_currentTarget = FindNearestEnemy();
-			if (_currentTarget != null)
-			{
-				GD.Print($"Objetivo encontrado para {GetType().Name}");
-			}
+			target = FindNearestEnemy();
 		}
 
-		if (_currentTarget != null && _attackTimer >= _attackSpeed && IsEnemyInRange(_currentTarget))
+		if (target != null && timeToNextAttack >= atkSpeed && IsEnemyInRange(target))
 		{
 			Attack();
-			_attackTimer = 0;
+			timeToNextAttack = 0;
 		}
 	}
-	
 
-	
-	public override void _Input(InputEvent @event)
+	public override void _Input(InputEvent evt)
 	{
-		if (@event is InputEventMouseMotion mouseMotion)
+		if (evt is InputEventMouseMotion mouseMov)
 		{
-			Vector2 mousePosition = GetGlobalMousePosition();
-			bool wasMouseOver = _isMouseOver;
-			_isMouseOver = mousePosition.DistanceTo(GlobalPosition) < 32;
+			Vector2 mousePos = GetGlobalMousePosition();
+			bool wasOver = mouseOver;
+			mouseOver = mousePos.DistanceTo(GlobalPosition) < 32;
 
-			if (wasMouseOver != _isMouseOver)
-			{
+			if (wasOver != mouseOver)
 				QueueRedraw();
-			}
 		}
 	}
 
@@ -132,61 +116,50 @@ public partial class Tower : Node2D
 	{
 		base._Draw();
 		
-		if (_isMouseOver)
+		if (mouseOver)
 		{
 			DrawArc(Vector2.Zero, 36, 0, Mathf.Tau, 32, new Color(1, 1, 1, 0.5f));
-			int sellValue = GetSellValue();
-			GameManager.Instance?.ShowMessage($"Click derecho para vender por {sellValue} oro");
+			int sellVal = GetSellValue();
+			GameManager.Instance?.ShowMessage($"Click derecho para vender por {sellVal} oro");
 		}
 	}
 
 	private void CreateRangeIndicator()
 	{
-		if (_rangeIndicator != null)
-		{
-			_rangeIndicator.QueueFree();
-		}
+		if (rangeInd != null)
+			rangeInd.QueueFree();
 
-		_rangeIndicator = new RangeIndicator(_range, _rangeColor);
-		AddChild(_rangeIndicator);
+		rangeInd = new RangeIndicator(range, rangeCol);
+		AddChild(rangeInd);
 	}
 
 	protected virtual void Attack()
 	{
-		if (_currentTarget != null && IsEnemyInRange(_currentTarget))
+		if (target != null && IsEnemyInRange(target))
 		{
-			if (_attackStrategy != null)
-			{
-				GD.Print($"Torre {GetType().Name} atacando con estrategia {_attackStrategy.GetType().Name}");
-				_attackStrategy.Attack(this, _currentTarget);
-			}
-			else
-			{
-				GD.PrintErr($"Error: Torre {GetType().Name} no tiene estrategia de ataque");
-			}
+			if (atkStrat != null)
+				atkStrat.Attack(this, target);
 		}
 	}
 
 	protected bool IsEnemyInRange(Enemy enemy)
-	{
-		return GlobalPosition.DistanceTo(enemy.GlobalPosition) <= _range;
-	}
+		=> GlobalPosition.DistanceTo(enemy.GlobalPosition) <= range;
 
 	private Enemy FindNearestEnemy()
 	{
 		var enemies = GetTree().GetNodesInGroup("Enemies");
 		Enemy nearest = null;
-		float nearestDistance = _range;
+		float nearestDist = range;
 
-		foreach (Node node in enemies)
+		foreach (Node n in enemies)
 		{
-			if (node is Enemy enemy)
+			if (n is Enemy enemy)
 			{
-				float distance = GlobalPosition.DistanceTo(enemy.GlobalPosition);
-				if (distance <= _range && (nearest == null || distance < nearestDistance))
+				float dist = GlobalPosition.DistanceTo(enemy.GlobalPosition);
+				if (dist <= range && (nearest == null || dist < nearestDist))
 				{
 					nearest = enemy;
-					nearestDistance = distance;
+					nearestDist = dist;
 				}
 			}
 		}
@@ -208,9 +181,9 @@ public partial class Tower : Node2D
 
 	protected virtual void InitializeTower()
 	{
-		_damage = 0;
-		_range = 0;
-		_attackSpeed = 0;
-		_cost = 0;
+		dmg = 0;
+		range = 0;
+		atkSpeed = 0;
+		cost = 0;
 	}
 }

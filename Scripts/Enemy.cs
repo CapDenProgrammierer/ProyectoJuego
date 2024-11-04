@@ -3,162 +3,156 @@ using System;
 
 public partial class Enemy : Node2D, IGameUnit
 {
-	private float _baseSpeed;
-	private float _currentSpeed;
-	private int _health;
-	private int _maxHealth;
-	private int _damage;
-	private int _goldReward;
-	private bool _isElite;
-	private bool _isFast;
-	protected ColorRect _healthBar;
-	private float _slowMultiplier = 1f;
-	private IEnemyState _currentState;
-	private float _endXPosition = 1100f;
-	protected Vector2 _startPosition = new Vector2(-50, 300);
-	private bool _hasStartedMoving = false;
-	protected IMovementStrategy _movementStrategy;
-	protected Sprite2D _sprite;
-	private bool _isDying = false;
+	float baseSpeed;
+	float speed;
+	int hp;
+	int maxHp;
+	int dmg;
+	int gold;
+	bool isElite;
+	bool isFast;
+	ColorRect hpBar;
+	float slowMult = 1f;
+	IEnemyState state;
+	float endX = 1100f;
+	Vector2 startPos = new Vector2(-50, 300);
+	bool started = false;
+	IMovementStrategy moveStrat;
+	Sprite2D sprite;
+	bool isDead = false;
 	
-	public bool IsDying => _isDying;
-	public float BaseSpeed => _baseSpeed;
+	public bool IsDying => isDead;
+	public float BaseSpeed => baseSpeed;
 	public float CurrentSpeed 
 	{ 
-		get => _currentSpeed;
-		set => _currentSpeed = value;
+		get => speed;
+		set => speed = value;
 	}
-	public float EndXPosition => _endXPosition;
-	public int Damage => _damage;
-	public int GoldReward => _goldReward;
-	public bool IsAlive => _health > 0 && !_isDying;
+	public float EndXPosition => endX;
+	public int Damage => dmg;
+	public int GoldReward => gold;
+	public bool IsAlive => hp > 0 && !isDead;
 	public float SlowMultiplier
 	{
-		get => _slowMultiplier;
-		set => _slowMultiplier = value;
+		get => slowMult;
+		set => slowMult = value;
 	}
 
-	public void Initialize(int health, int damage, float speed, int goldReward, bool isElite, bool isFast = false, IMovementStrategy movementStrategy = null)
+	public void Initialize(int health, int damage, float speed, int goldReward, bool eliteFlag, bool fastFlag = false, IMovementStrategy movementStrategy = null)
 	{
-		_health = health;
-		_maxHealth = health;
-		_damage = damage;
-		_baseSpeed = speed;
-		_currentSpeed = speed;
-		_goldReward = goldReward;
-		_isElite = isElite;
-		_isFast = isFast;
-		_hasStartedMoving = false;
-		_isDying = false;
-		_movementStrategy = movementStrategy ?? new StraightLineMovement();
+		hp = health;
+		maxHp = health;
+		dmg = damage;
+		baseSpeed = speed;
+		this.speed = speed;
+		gold = goldReward;
+		isElite = eliteFlag;
+		isFast = fastFlag;
+		started = false;
+		isDead = false;
+		moveStrat = movementStrategy ?? new StraightLineMovement();
 		ChangeState(new MovingState());
 	}
 
 	public void TakeDamage(float damage)
 	{
-		if (_isDying) return;
+		if (isDead) return;
 		
-		_health -= (int)damage;
-		UpdateHealthBar();
+		hp -= (int)damage;
+		UpdateHPBar();
 		
-		if (_health <= 0 && _currentState is not DyingState)
+		if (hp <= 0 && state is not DyingState)
 		{
-			_isDying = true;
+			isDead = true;
 			RemoveFromGroup("Enemies");
 			ChangeState(new DyingState());
 		}
 	}
 
-	public void ApplySlow(float slowAmount, float duration)
+	public void ApplySlow(float amount, float duration)
 	{
-		if (_isDying) return;
-		_slowMultiplier = Mathf.Min(_slowMultiplier, 1f - slowAmount);
-		ChangeState(new SlowedState(_currentState, duration));
+		if (isDead) return;
+		slowMult = Mathf.Min(slowMult, 1f - amount);
+		ChangeState(new SlowedState(state, duration));
 	}
 
 	public void ChangeState(IEnemyState newState)
 	{
-		_currentState?.Exit(this);
-		_currentState = newState;
-		_currentState.Enter(this);
+		state?.Exit(this);
+		state = newState;
+		state.Enter(this);
 	}
 
 	public override void _Ready()
 	{
 		AddToGroup("Enemies");
-		InitializeVisuals();
+		InitSprite();
 		UnitManager.Instance?.RegisterEnemy(this);
-		GlobalPosition = _startPosition;
-		_hasStartedMoving = true;
+		GlobalPosition = startPos;
+		started = true;
 	}
 
-	protected virtual void InitializeVisuals()
+	void InitSprite()
 	{
-		_sprite = new Sprite2D();
-		_sprite.ZIndex = 0;
-		AddChild(_sprite);
+		sprite = new Sprite2D();
+		sprite.ZIndex = 0;
+		AddChild(sprite);
 
-		_healthBar = new ColorRect();
-		_healthBar.Size = new Vector2(_isElite || !_isFast ? 32 : 24, 4);
-		_healthBar.Position = new Vector2(_isElite || !_isFast ? -16 : -12, _isElite || !_isFast ? -24 : -20);
-		_healthBar.Color = Colors.Green;
-		_healthBar.ZIndex = 1;
-		AddChild(_healthBar);
+		hpBar = new ColorRect();
+		hpBar.Size = new Vector2(isElite || !isFast ? 32 : 24, 4);
+		hpBar.Position = new Vector2(isElite || !isFast ? -16 : -12, isElite || !isFast ? -24 : -20);
+		hpBar.Color = Colors.Green;
+		hpBar.ZIndex = 1;
+		AddChild(hpBar);
 
-		if (_isElite)
+		if (isElite)
 		{
-			var eliteIndicator = new ColorRect();
-			eliteIndicator.Size = new Vector2(16, 8);
-			eliteIndicator.Position = new Vector2(-8, -28);
-			eliteIndicator.Color = Colors.Yellow;
-			eliteIndicator.ZIndex = 2;
-			AddChild(eliteIndicator);
+			var eliteMark = new ColorRect();
+			eliteMark.Size = new Vector2(16, 8);
+			eliteMark.Position = new Vector2(-8, -28);
+			eliteMark.Color = Colors.Yellow;
+			eliteMark.ZIndex = 2;
+			AddChild(eliteMark);
 		}
 
-		if (_isElite)
-		{
-			CreateEliteSprite();
-		}
-		else if (_isFast)
-		{
-			CreateFastSprite();
-		}
+		if (isElite)
+			MakeEliteSprite();
+		else if (isFast)
+			MakeFastSprite();
 		else
+			MakeNormalSprite();
+	}
+
+	void MakeNormalSprite()
+	{
+		var tex = GD.Load<Texture2D>("res://Assets/Imagenes/Enemigo1.png");
+		if (tex != null)
 		{
-			CreateNormalSprite();
+			sprite.Texture = tex;
+			float scl = 32.0f / tex.GetWidth();
+			sprite.Scale = new Vector2(scl, scl);
 		}
 	}
 
-	private void CreateNormalSprite()
+	void MakeFastSprite()
 	{
-		var texture = GD.Load<Texture2D>("res://Assets/Imagenes/Enemigo1.png");
-		if (texture != null)
+		var tex = GD.Load<Texture2D>("res://Assets/Imagenes/Enemigo2.png");
+		if (tex != null)
 		{
-			_sprite.Texture = texture;
-			float scale = 32.0f / texture.GetWidth();
-			_sprite.Scale = new Vector2(scale, scale);
+			sprite.Texture = tex;
+			float scl = 24.0f / tex.GetWidth();
+			sprite.Scale = new Vector2(scl, scl);
 		}
 	}
 
-	private void CreateFastSprite()
+	void MakeEliteSprite()
 	{
-		var texture = GD.Load<Texture2D>("res://Assets/Imagenes/Enemigo2.png");
-		if (texture != null)
+		var tex = GD.Load<Texture2D>("res://Assets/Imagenes/Enemigo3.png");
+		if (tex != null)
 		{
-			_sprite.Texture = texture;
-			float scale = 24.0f / texture.GetWidth();
-			_sprite.Scale = new Vector2(scale, scale);
-		}
-	}
-
-	private void CreateEliteSprite()
-	{
-		var texture = GD.Load<Texture2D>("res://Assets/Imagenes/Enemigo3.png");
-		if (texture != null)
-		{
-			_sprite.Texture = texture;
-			float scale = 32.0f / texture.GetWidth();
-			_sprite.Scale = new Vector2(scale, scale);
+			sprite.Texture = tex;
+			float scl = 32.0f / tex.GetWidth();
+			sprite.Scale = new Vector2(scl, scl);
 		}
 	}
 
@@ -167,14 +161,14 @@ public partial class Enemy : Node2D, IGameUnit
 		UnitManager.Instance?.UnregisterEnemy(this);
 	}
 
-	private void UpdateHealthBar()
+	void UpdateHPBar()
 	{
-		if (_healthBar != null)
+		if (hpBar != null)
 		{
-			float healthPercentage = (float)_health / _maxHealth;
-			float baseWidth = _isElite || !_isFast ? 32 : 24;
-			_healthBar.Size = new Vector2(baseWidth * healthPercentage, 4);
-			_healthBar.Color = new Color(1 - healthPercentage, healthPercentage, 0);
+			float hpPercent = (float)hp / maxHp;
+			float w = isElite || !isFast ? 32 : 24;
+			hpBar.Size = new Vector2(w * hpPercent, 4);
+			hpBar.Color = new Color(1 - hpPercent, hpPercent, 0);
 		}
 	}
 	
@@ -185,34 +179,26 @@ public partial class Enemy : Node2D, IGameUnit
 	
 	public override void _Process(double delta)
 	{
-		_currentState?.Update(this, delta);
+		state?.Update(this, delta);
 	}
 	
- public void ApplyEffect(IEffect effect)
+	public void ApplyEffect(IEffect effect)
 	{
-		if (!_isDying)
-		{
+		if (!isDead)
 			effect.Apply(this);
-		}
 	}
 
 	public void UpdateUnit(double delta)
 	{
-		if (_movementStrategy != null && !_isDying)
+		if (moveStrat != null && !isDead)
 		{
-			Vector2 movement = _movementStrategy.GetMovement(this, (float)delta);
+			Vector2 movement = moveStrat.GetMovement(this, (float)delta);
 			Position += movement;
-			
-			// Debug para verificar el movimiento
-			if (Mathf.Abs(movement.Y) > 0.1f)
-			{
-				GD.Print($"Enemy movement - X: {movement.X:F2}, Y: {movement.Y:F2}");
-			}
 		}
 	}
+
 	public override void _PhysicsProcess(double delta)
 	{
-		// Aseguramos que el movimiento se procese en el physics frame
 		UpdateUnit(delta);
 	}
 }

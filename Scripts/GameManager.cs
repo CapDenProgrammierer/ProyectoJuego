@@ -4,131 +4,101 @@ using System.Collections.Generic;
 
 public partial class GameManager : Node
 {
-	private static GameManager _instance;
-	public static GameManager Instance
-	{
-		get { return _instance; }
-	}
+	static GameManager instance;
+	public static GameManager Instance => instance;
 
-	private GameUI _gameUI;
-	private GameOverScreen _gameOverScreen;
-	private WaveManager _waveManager;
-	private bool _isPaused = false;
-	public bool IsPaused => _isPaused;
+	GameUI gameUi;
+	GameOverScreen goScreen;
+	WaveManager waveMan;
+	bool gamePaused;
+	public bool IsPaused => gamePaused;
 
-	private int _gold = 100;
-	private int _lives = 20;
-	private int _score = 0;
-	private bool _isGameOver = false;
+	int playerGold = 100;
+	int playerLives = 20;
+	int playerScore = 0;
+	bool isGameOver;
 
-	public int Gold { get { return _gold; } }
-	public int Lives { get { return _lives; } }
-	public int Score { get { return _score; } }
-	public bool IsGameOver { get { return _isGameOver; } }
+	public int Gold => playerGold;
+	public int Lives => playerLives;
+	public int Score => playerScore;
+	public bool IsGameOver => isGameOver;
 
 	public override void _EnterTree()
 	{
-		if (_instance == null)
+		if (instance == null)
+			instance = this;
+	}
+
+	public override void _Ready()
+	{
+		ProcessMode = ProcessModeEnum.Always;
+
+		gameUi = GetNode<GameUI>("/root/Main/UI/GameUI");
+		waveMan = GetNode<WaveManager>("/root/Main/WaveManager");
+		
+		goScreen = new GameOverScreen();
+		GetNode<CanvasLayer>("/root/Main/UI").AddChild(goScreen);
+
+		GameEventSystem.Instance?.AddObserver(new GameManagerObserver(this));
+		
+		var eventSys = GameEventSystem.Instance;
+		if (eventSys != null)
 		{
-			_instance = this;
+			eventSys.NotifyObservers(new ResourceEvent(ResourceType.Gold, 0, playerGold));
+			eventSys.NotifyObservers(new ResourceEvent(ResourceType.Lives, 0, playerLives));
 		}
 	}
 
-	 public override void _Ready()
-{
-	ProcessMode = ProcessModeEnum.Always;
-
-
-	_gameUI = GetNode<GameUI>("/root/Main/UI/GameUI");
-	_waveManager = GetNode<WaveManager>("/root/Main/WaveManager");
-	
-	_gameOverScreen = new GameOverScreen();
-	GetNode<CanvasLayer>("/root/Main/UI").AddChild(_gameOverScreen);
-
-	GameEventSystem.Instance?.AddObserver(new GameManagerObserver(this));
-	
-	GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(
-		ResourceType.Gold,
-		0,
-		_gold
-	));
-	
-	GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(
-		ResourceType.Lives,
-		0,
-		_lives
-	));
-}
-
-	  private class GameManagerObserver : IGameEventObserver
+	private class GameManagerObserver : IGameEventObserver
 	{
-		private readonly GameManager _gameManager;
+		readonly GameManager gm;
 
 		public GameManagerObserver(GameManager gameManager)
 		{
-			_gameManager = gameManager;
+			gm = gameManager;
 		}
 
 		public void OnGameEvent(GameEvent gameEvent)
 		{
 			switch (gameEvent)
 			{
-				case EnemyEvent enemyEvent:
-					if (enemyEvent.Type == EnemyEventType.Killed)
-					{
-						_gameManager.AddGold(enemyEvent.Reward);
-					}
-					else if (enemyEvent.Type == EnemyEventType.ReachedEnd)
-					{
-						GD.Print("Enemigo alcanzó la base"); 
-					}
+				case EnemyEvent enemyEvt:
+					if (enemyEvt.Type == EnemyEventType.Killed)
+						gm.AddGold(enemyEvt.Reward);
 					break;
 
-				case TowerEvent towerEvent:
-					if (towerEvent.Type == TowerEventType.Sold)
-					{
-						_gameManager.AddGold(towerEvent.Cost);
-					}
+				case TowerEvent towerEvt:
+					if (towerEvt.Type == TowerEventType.Sold)
+						gm.AddGold(towerEvt.Cost);
 					break;
 			}
 		}
 	}
 
-	public void ShowMessage(string message)
-	{
-		GameEventSystem.Instance?.NotifyObservers(new MessageEvent(message));
-	}
+	public void ShowMessage(string msg) 
+		=> GameEventSystem.Instance?.NotifyObservers(new MessageEvent(msg));
 
-	 private void SetGamePaused(bool paused)
+	void SetGamePaused(bool paused)
 	{
-		GD.Print($"Estableciendo pausa: {paused}"); 
-		_isPaused = paused;
+		gamePaused = paused;
 		GetTree().Paused = paused;
 		
-		if (_gameUI != null)
-		{
-			_gameUI.ProcessMode = paused ? Node.ProcessModeEnum.Always : Node.ProcessModeEnum.Inherit;
-		}
+		if (gameUi != null)
+			gameUi.ProcessMode = paused ? ProcessModeEnum.Always : ProcessModeEnum.Inherit;
 		
-		if (_gameOverScreen != null)
-		{
-			_gameOverScreen.ProcessMode = Node.ProcessModeEnum.Always;
-		}
+		if (goScreen != null)
+			goScreen.ProcessMode = ProcessModeEnum.Always;
 	}
 
 	public bool SpendGold(int amount)
 	{
-		if (_isGameOver) return false;
+		if (isGameOver) return false;
 
-		if (_gold >= amount)
+		if (playerGold >= amount)
 		{
-			int previousGold = _gold;
-			_gold -= amount;
-			GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(
-				ResourceType.Gold, 
-				previousGold, 
-				_gold
-			));
+			int prevGold = playerGold;
+			playerGold -= amount;
+			GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(ResourceType.Gold, prevGold, playerGold));
 			return true;
 		}
 		
@@ -136,244 +106,135 @@ public partial class GameManager : Node
 		return false;
 	}
 
-	public void TakeDamage(int damage)
-{
-	if (_isGameOver) return;
-
-	int previousLives = _lives;
-	
-
-	if (damage >= _lives)
+	public void TakeDamage(int dmg)
 	{
-		 GD.Print($"Daño fatal detectado. Vidas actuales: {_lives}, Daño: {damage}");
-		_lives = 0;
-		_isGameOver = true;
-		
-		 GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(
-			ResourceType.Lives,
-			previousLives,
-			_lives
-		));
+		if (isGameOver) return;
 
-		GameEventSystem.Instance?.NotifyObservers(new MessageEvent(
-			 "¡La base ha sido destruida!"
-		));
+		int prevLives = playerLives;
 
-		 GetTree().CallGroup("Enemies", "queue_free");
-
-		CallDeferred(nameof(InitiateGameOver));
-		return;
-	}
-
-	_lives -= damage;
-	
-	 GD.Print($"Daño aplicado. Vidas antes: {previousLives}, Daño: {damage}, Vidas después: {_lives}");
-
-	VisualEffectSystem.Instance?.CreateBaseHitEffect(new Vector2(1100, 300));
-	
-	GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(
-		ResourceType.Lives,
-		previousLives,
-		_lives
-	));
-
-	GameEventSystem.Instance?.NotifyObservers(new MessageEvent(
-		$"¡La base recibió {damage} de daño! Vidas restantes: {_lives}"
-	));
-}
- 
- private void ClearExistingEnemies()
-{
-	var enemies = GetTree().GetNodesInGroup("Enemies");
-	foreach (Node enemy in enemies)
-	{
-		enemy.QueueFree();
-	}
-}
-
-	private void InitiateGameOver()
-{
-	if (_gameOverScreen == null)
-	{
-		_gameOverScreen = new GameOverScreen();
-		 var ui = GetNode<CanvasLayer>("/root/Main/UI");
-		if (ui != null)
+		if (dmg >= playerLives)
 		{
-			ui.AddChild(_gameOverScreen);
-			GD.Print("Game Over Screen añadida a la UI");
-		}
-		else
-		{
-			GD.PrintErr("No se pudo encontrar el nodo UI");
+			playerLives = 0;
+			isGameOver = true;
+			
+			GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(ResourceType.Lives, prevLives, playerLives));
+			GameEventSystem.Instance?.NotifyObservers(new MessageEvent("¡La base ha sido destruida!"));
+
+			GetTree().CallGroup("Enemies", "queue_free");
+			CallDeferred(nameof(InitiateGameOver));
 			return;
 		}
+
+		playerLives -= dmg;
+		
+		VisualEffectSystem.Instance?.CreateBaseHitEffect(new Vector2(1100, 300));
+		
+		var eventSys = GameEventSystem.Instance;
+		if (eventSys != null)
+		{
+			eventSys.NotifyObservers(new ResourceEvent(ResourceType.Lives, prevLives, playerLives));
+			eventSys.NotifyObservers(new MessageEvent($"¡La base recibió {dmg} de daño! Vidas: {playerLives}"));
+		}
 	}
 
-	GetTree().Paused = true;
-
-
-	_gameOverScreen.Show(_waveManager?.CurrentWave ?? 0, _gold);
-	
-	GD.Print("Pantalla de Game Over mostrada");
-
-
-	 GameEventSystem.Instance?.NotifyObservers(new GameOverEvent(
-		_waveManager?.CurrentWave ?? 0,
-		_gold,
-		_score
-	));
-}
-
-public override void _UnhandledInput(InputEvent @event)
-{
-	if (_isGameOver && @event.IsPressed())
+	void InitiateGameOver()
 	{
-		if (@event is InputEventKey || @event is InputEventMouseButton)
+		if (goScreen == null)
 		{
-			GD.Print("Input detectado durante Game Over, reiniciando juego");
+			goScreen = new GameOverScreen();
+			var ui = GetNode<CanvasLayer>("/root/Main/UI");
+			ui?.AddChild(goScreen);
+		}
+
+		GetTree().Paused = true;
+		goScreen.Show(waveMan?.CurrentWave ?? 0, playerGold);
+		
+		GameEventSystem.Instance?.NotifyObservers(new GameOverEvent(
+			waveMan?.CurrentWave ?? 0,
+			playerGold,
+			playerScore
+		));
+	}
+
+	public override void _UnhandledInput(InputEvent evt)
+	{
+		if (isGameOver && evt.IsPressed())
+		{
+			if (evt is InputEventKey || evt is InputEventMouseButton)
 				RestartGame();
 		}
 	}
-}
+
+	public void AddGold(int amount)
+	{
+		if (isGameOver) return;
+
+		int prevGold = playerGold;
+		int prevScore = playerScore;
+		
+		playerGold += amount;
+		playerScore += amount;
+
+		var eventSys = GameEventSystem.Instance;
+		if (eventSys != null)
+		{
+			eventSys.NotifyObservers(new ResourceEvent(ResourceType.Gold, prevGold, playerGold));
+			eventSys.NotifyObservers(new ResourceEvent(ResourceType.Score, prevScore, playerScore));
+		}
+	}
 
 	public void AddLives(int amount)
 	{
-		if (_isGameOver) return;
-
-		int previousLives = _lives;
-		_lives += amount;
+		if (isGameOver) return;
 		
-		GameEventSystem.Instance.NotifyObservers(new ResourceEvent(
+		int prevLives = playerLives;
+		playerLives += amount;
+		
+		GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(
 			ResourceType.Lives,
-			previousLives,
-			_lives
+			prevLives,
+			playerLives
 		));
 	}
 
-public void AddGold(int amount)
+	void RestartGame()
 	{
-		if (_isGameOver) return;
-
-		int previousGold = _gold;
-		int previousScore = _score;
-		
-		_gold += amount;
-		_score += amount;
-
-		GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(
-			ResourceType.Gold,
-			previousGold,
-			_gold
-		));
-
-		GameEventSystem.Instance?.NotifyObservers(new ResourceEvent(
-			ResourceType.Score,
-			previousScore,
-			_score
-		));
-	}
-
-	  private void GameOver()
-	{
-		if (_isGameOver) return;
-
-		_isGameOver = true;
-		GD.Print("Game Over activado"); 
-		
-		if (_gameOverScreen != null)
+		if (goScreen != null)
 		{
-			int currentWave = _waveManager != null ? _waveManager.CurrentWave : 0;
-			_gameOverScreen.Show(currentWave, _gold);
-			
-			
-			_gameOverScreen.Visible = true;
-			_gameOverScreen.ZIndex = 100; 
-			
-			CallDeferred(nameof(SetGamePaused), true);
-		}
-		else
-		{
-			GD.PrintErr("_gameOverScreen es null"); 
-		}
-
-		GameEventSystem.Instance?.NotifyObservers(new GameOverEvent(
-			_waveManager?.CurrentWave ?? 0,
-			_gold,
-			_score
-		));
-		
-		GD.Print("=== GAME OVER ===");
-		GD.Print($"Oleada alcanzada: {_waveManager?.CurrentWave}");
-		GD.Print($"Oro final: {_gold}");
-		GD.Print($"Puntuación final: {_score}");
-	}
-	
-	private void RestartGame()
-	{
-		GD.Print("Iniciando reinicio del juego");
-		
-		if (_gameOverScreen != null)
-		{
-			_gameOverScreen.QueueFree();
-			_gameOverScreen = null;
+			goScreen.QueueFree();
+			goScreen = null;
 		}
 
 		GetTree().Paused = false;
 		
-		_isGameOver = false;
-		_gold = 100;
-		_lives = 20;
-		_score = 0;
+		isGameOver = false;
+		playerGold = 100;
+		playerLives = 20;
+		playerScore = 0;
 		
 		GetTree().CallGroup("Enemies", "queue_free");
-		
 		GetTree().ReloadCurrentScene();
+	}
+
+	public void QuitGame() => GetTree().Quit();
+
+	public override void _Input(InputEvent evt)
+	{
+		if (!isGameOver) return;
 		
-		GD.Print("Juego reiniciado exitosamente");
+		if (evt.IsPressed())
+			RestartGame();
 	}
-
-	public void QuitGame()
-	{
-		GetTree().Quit();
-	}
-
-public override void _Input(InputEvent @event)
-	{
-		if (_isGameOver)
-		{
-			GD.Print("Input detectado durante Game Over");
-			if (@event is InputEventKey eventKey)
-			{
-				if (eventKey.Pressed)
-				{
-					GD.Print("Tecla presionada, reiniciando juego");
-					RestartGame();
-				}
-			}
-			else if (@event is InputEventMouseButton mouseButton)
-			{
-				if (mouseButton.Pressed)
-				{
-					GD.Print("Click detectado, reiniciando juego");
-					RestartGame();
-				}
-			}
-		}
-	}
-
 
 	public override void _Notification(int what)
 	{
 		if (what == NotificationApplicationResumed)
 		{
-			if (_gameUI != null)
-			{
-				_gameUI.ProcessMode = Node.ProcessModeEnum.Always;
-			}
-			if (_gameOverScreen != null && _isGameOver)
-			{
-				_gameOverScreen.ProcessMode = Node.ProcessModeEnum.Always;
-			}
+			if (gameUi != null)
+				gameUi.ProcessMode = ProcessModeEnum.Always;
+			
+			if (goScreen != null && isGameOver)
+				goScreen.ProcessMode = ProcessModeEnum.Always;
 		}
 	}
 }

@@ -1,57 +1,53 @@
 using Godot;
 using System;
 
-	public partial class Background : Node2D
+public partial class Background : Node2D
 {
-		private TextureRect _backgroundTexture;
-	private ColorRect _backgroundColor;
-		private const string BACKGROUND_PATH = "res://Assets/Imagenes/background.png";
+	TextureRect bgImage;
+	ColorRect bgColor;
+	const string BG_PATH = "res://Assets/Imagenes/background.png";
 
 	public override void _Ready()
 	{
-		CreateBackground();
+		SetupBackground();
 	}
 
-	private void CreateBackground()
+	void SetupBackground()
 	{
-		var viewportSize = GetViewport().GetVisibleRect().Size;
+		var screenSize = GetViewport().GetVisibleRect().Size;
 
-		_backgroundColor = new ColorRect
+		bgColor = new ColorRect
 		{
 			Position = Vector2.Zero,
-				Size = viewportSize,
+			Size = screenSize,
 			Color = new Color(0.1f, 0.1f, 0.15f)
 		};
-			AddChild(_backgroundColor);
+		AddChild(bgColor);
 
-		_backgroundTexture = new TextureRect
+		bgImage = new TextureRect
 		{
 			Position = Vector2.Zero,
-			Size = viewportSize
+			Size = screenSize
 		};
 
-			_backgroundTexture.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
+		bgImage.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
 
-			var texture = GD.Load<Texture2D>(BACKGROUND_PATH);
-		if (texture != null)
+		var tex = GD.Load<Texture2D>(BG_PATH);
+		if (tex != null)
 		{
-			_backgroundTexture.Texture = texture;
-			AddChild(_backgroundTexture);
+			bgImage.Texture = tex;
+			AddChild(bgImage);
 		}
 	}
 
-		public override void _Process(double delta)
+	public override void _Process(double delta)
 	{
-			var viewportSize = GetViewport().GetVisibleRect().Size;
+		var screenSize = GetViewport().GetVisibleRect().Size;
 		
-			if (_backgroundColor != null && _backgroundColor.Size != viewportSize)
-		{
-			_backgroundColor.Size = viewportSize;
-		}
+		if (bgColor != null && bgColor.Size != screenSize)
+			bgColor.Size = screenSize;
 
-			if (_backgroundTexture != null && _backgroundTexture.Size != viewportSize)
-		{
-			_backgroundTexture.Size = viewportSize;
-		}
+		if (bgImage != null && bgImage.Size != screenSize)
+			bgImage.Size = screenSize;
 	}
 }

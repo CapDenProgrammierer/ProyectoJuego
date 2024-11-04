@@ -3,90 +3,85 @@ using System;
 
 public partial class GameOverScreen : Control
 {
-	private Label _gameOverLabel;
-	private Label _waveLabel;
-	private Label _scoreLabel;
-	private Panel _backgroundPanel;
+	Label mainText;
+	Label waveText;
+	Label scoreText;
+	Panel darkBg;
 
 	public override void _Ready()
 	{
-
-		 SetAnchorsPreset(LayoutPreset.FullRect);
-		CreateBackground();
-		CreateLayout();
+		SetAnchorsPreset(LayoutPreset.FullRect);
+		CreateBg();
+		SetupUI();
 		Hide();
-		
 		
 		ProcessMode = ProcessModeEnum.Always;
 	}
 
-	private void CreateBackground()
+	void CreateBg()
 	{
-		 _backgroundPanel = new Panel();
-		_backgroundPanel.SetAnchorsPreset(LayoutPreset.FullRect);
-		_backgroundPanel.Modulate = new Color(0, 0, 0, 0.9f);
-		AddChild(_backgroundPanel);
+		darkBg = new Panel();
+		darkBg.SetAnchorsPreset(LayoutPreset.FullRect);
+		darkBg.Modulate = new Color(0, 0, 0, 0.9f);
+		AddChild(darkBg);
 	}
 
-	private void CreateLayout()
+	void SetupUI()
 	{
-		var container = new VBoxContainer();
-		container.SetAnchorsPreset(LayoutPreset.Center);
-		container.GrowHorizontal = GrowDirection.Both;
-		container.GrowVertical = GrowDirection.Both;
-		container.Size = new Vector2(600, 400);
-		container.Position = new Vector2(-300, -200); 
+		var content = new VBoxContainer();
+		content.SetAnchorsPreset(LayoutPreset.Center);
+		content.GrowHorizontal = GrowDirection.Both;
+		content.GrowVertical = GrowDirection.Both;
+		content.Size = new Vector2(600, 400);
+		content.Position = new Vector2(-300, -200); 
 
-		_gameOverLabel = new Label
+		mainText = new Label
 		{
 			Text = "¡GAME OVER!",
 			HorizontalAlignment = HorizontalAlignment.Center
 		};
-		_gameOverLabel.AddThemeFontSizeOverride("font_size", 64);
-		_gameOverLabel.AddThemeColorOverride("font_color", Colors.Red);
-		container.AddChild(_gameOverLabel);
+		mainText.AddThemeFontSizeOverride("font_size", 64);
+		mainText.AddThemeColorOverride("font_color", Colors.Red);
+		content.AddChild(mainText);
 
+		content.AddChild(new Control { CustomMinimumSize = new Vector2(0, 50) });
 
-		container.AddChild(new Control { CustomMinimumSize = new Vector2(0, 50) });
-
-		_waveLabel = new Label
+		waveText = new Label
 		{
 			HorizontalAlignment = HorizontalAlignment.Center
 		};
-		_waveLabel.AddThemeFontSizeOverride("font_size", 32);
-		_waveLabel.AddThemeColorOverride("font_color", Colors.White);
-		container.AddChild(_waveLabel);
+		waveText.AddThemeFontSizeOverride("font_size", 32);
+		waveText.AddThemeColorOverride("font_color", Colors.White);
+		content.AddChild(waveText);
 
-		container.AddChild(new Control { CustomMinimumSize = new Vector2(0, 30) });
+		content.AddChild(new Control { CustomMinimumSize = new Vector2(0, 30) });
 
-		_scoreLabel = new Label
+		scoreText = new Label
 		{
 			HorizontalAlignment = HorizontalAlignment.Center
 		};
-		_scoreLabel.AddThemeFontSizeOverride("font_size", 32);
-		_scoreLabel.AddThemeColorOverride("font_color", Colors.Yellow);
-		container.AddChild(_scoreLabel);
+		scoreText.AddThemeFontSizeOverride("font_size", 32);
+		scoreText.AddThemeColorOverride("font_color", Colors.Yellow);
+		content.AddChild(scoreText);
 
-		container.AddChild(new Control { CustomMinimumSize = new Vector2(0, 50) });
+		content.AddChild(new Control { CustomMinimumSize = new Vector2(0, 50) });
 
-		var restartLabel = new Label
+		var restartMsg = new Label
 		{
 			Text = "Presiona cualquier tecla para reiniciar",
 			HorizontalAlignment = HorizontalAlignment.Center
 		};
-		restartLabel.AddThemeFontSizeOverride("font_size", 24);
-		restartLabel.AddThemeColorOverride("font_color", Colors.White);
-		container.AddChild(restartLabel);
+		restartMsg.AddThemeFontSizeOverride("font_size", 24);
+		restartMsg.AddThemeColorOverride("font_color", Colors.White);
+		content.AddChild(restartMsg);
 
-		AddChild(container);
+		AddChild(content);
 	}
 
-	public new void Show(int waveNumber, int gold)
+	public new void Show(int wave, int gold)
 	{
-		GD.Print("Mostrando pantalla de Game Over");
-		
-		_waveLabel.Text = $"Llegaste hasta la oleada {waveNumber}";
-		_scoreLabel.Text = $"Oro acumulado: {gold}";
+		waveText.Text = $"Llegaste hasta la oleada {wave}";
+		scoreText.Text = $"Oro acumulado: {gold}";
 
 		Visible = true;
 		ZIndex = 1000;

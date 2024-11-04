@@ -2,17 +2,17 @@ using Godot;
 
 public partial class RangeIndicator : Node2D
 {
-	private float _range;
-	private Color _color;
+	float radius;
+	Color rangeColor;
 
 	public RangeIndicator(float range, Color color)
 	{
-		_range = range;
-		_color = color;
+		radius = range;
+		rangeColor = color;
 	}
 
 	public override void _Draw()
 	{
-		DrawCircle(Vector2.Zero, _range, _color);
+		DrawCircle(Vector2.Zero, radius, rangeColor);
 	}
 }

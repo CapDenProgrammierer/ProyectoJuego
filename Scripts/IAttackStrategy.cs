@@ -11,81 +11,65 @@ public class SingleTargetAttack : IAttackStrategy
 {
 	public void Attack(Tower tower, Enemy target)
 	{
-		var projectile = Tower.ProjectileScene.Instantiate<Projectile>();
-		 if (projectile != null)
+		var bullet = Tower.ProjectileScene.Instantiate<Projectile>();
+		if (bullet != null)
 		{
-			 GD.Print("Creando proyectil de ataque simple");
-			tower.GetTree().Root.AddChild(projectile);
-			projectile.GlobalPosition = tower.GlobalPosition;
-			 projectile.Initialize(target, tower.Damage);
-		}
-		else
-		{
-			GD.PrintErr("Error al crear proyectil simple");
+			tower.GetTree().Root.AddChild(bullet);
+			bullet.GlobalPosition = tower.GlobalPosition;
+			bullet.Initialize(target, tower.Damage);
 		}
 	}
 }
 
 public class AreaDamageAttack : IAttackStrategy
 {
-	private float _damageRadius = 120f;
+	float blastRadius = 120f;
 
 	public void Attack(Tower tower, Enemy target)
 	{
-		var projectile = Tower.ProjectileScene.Instantiate<Projectile>();
-		if (projectile != null)
+		var bullet = Tower.ProjectileScene.Instantiate<Projectile>();
+		if (bullet != null)
 		{
-			GD.Print($"Creando proyectil de área con radio {_damageRadius}");
-			tower.GetTree().Root.AddChild(projectile);
-			projectile.GlobalPosition = tower.GlobalPosition;
-			projectile.InitializeAreaDamage(target, tower.Damage * 0.7f, _damageRadius);
-		}
-		else
-		{
-			GD.PrintErr("Error al crear proyectil de área");
+			tower.GetTree().Root.AddChild(bullet);
+			bullet.GlobalPosition = tower.GlobalPosition;
+			bullet.InitializeAreaDamage(target, tower.Damage * 0.7f, blastRadius);
 		}
 	}
 }
 
 public class SlowingAttack : IAttackStrategy
 {
-	private float _slowAmount = 0.5f;
-	private float _slowDuration = 3.0f;
+	float slowPower = 0.5f;
+	float slowDur = 3.0f;
 
 	public void Attack(Tower tower, Enemy target)
 	{
-		var projectile = Tower.ProjectileScene.Instantiate<Projectile>();
-		if (projectile != null)
+		var bullet = Tower.ProjectileScene.Instantiate<Projectile>();
+		if (bullet != null)
 		{
-			GD.Print($"Creando proyectil ralentizador: {_slowAmount * 100}% durante {_slowDuration}s");
-			tower.GetTree().Root.AddChild(projectile);
-			projectile.GlobalPosition = tower.GlobalPosition;
-			projectile.InitializeSlowing(target, tower.Damage * 0.6f, _slowAmount, _slowDuration);
-		}
-		else
-		{
-			GD.PrintErr("Error al crear proyectil ralentizador");
+			tower.GetTree().Root.AddChild(bullet);
+			bullet.GlobalPosition = tower.GlobalPosition;
+			bullet.InitializeSlowing(target, tower.Damage * 0.6f, slowPower, slowDur);
 		}
 	}
 }
 
 public class MultiTargetAttack : IAttackStrategy
 {
-	private int _targetCount = 3;
+	int maxTargets = 3;
 
 	public void Attack(Tower tower, Enemy mainTarget)
 	{
-		var enemies = tower.GetNearestEnemies(_targetCount);
-		GD.Print($"Ataque múltiple a {enemies.Count} objetivos");
-
+		var enemies = tower.GetNearestEnemies(maxTargets);
+		
 		foreach (var enemy in enemies)
 		{
-			var projectile = Tower.ProjectileScene.Instantiate<Projectile>();
-			if (projectile != null)
+			var bullet = Tower.ProjectileScene.Instantiate<Projectile>();
+			if (bullet != null)
 			{
-				tower.GetTree().Root.AddChild(projectile);
-				projectile.GlobalPosition = tower.GlobalPosition;
-				projectile.Initialize(enemy, tower.Damage * 0.8f);
+				tower.GetTree().Root.AddChild(bullet);
+				bullet.GlobalPosition = tower.GlobalPosition;
+				bullet.Initialize(enemy, tower.Damage * 0.8f);
 			}
 		}
 	}

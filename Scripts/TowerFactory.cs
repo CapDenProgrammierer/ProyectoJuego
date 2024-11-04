@@ -12,44 +12,33 @@ public class TowerFactory
 		Ultimate
 	}
 
-	private PackedScene _basicTowerScene;
-	private PackedScene _advancedTowerScene;
-	private PackedScene _eliteTowerScene;
-	private PackedScene _masterTowerScene;
-	private PackedScene _ultimateTowerScene;
+	private PackedScene basicTower;
+	private PackedScene advancedTower;
+	private PackedScene eliteTower;
+	private PackedScene masterTower;
+	private PackedScene ultimateTower;
 
 	public TowerFactory()
 	{
-		_basicTowerScene = GD.Load<PackedScene>("res://Scenes/BasicTower.tscn");
-		_advancedTowerScene = GD.Load<PackedScene>("res://Scenes/AdvancedTower.tscn");
-		_eliteTowerScene = GD.Load<PackedScene>("res://Scenes/EliteTower.tscn");
-		_masterTowerScene = GD.Load<PackedScene>("res://Scenes/MasterTower.tscn");
-		_ultimateTowerScene = GD.Load<PackedScene>("res://Scenes/UltimateTower.tscn");
+		basicTower = GD.Load<PackedScene>("res://Scenes/BasicTower.tscn");
+		advancedTower = GD.Load<PackedScene>("res://Scenes/AdvancedTower.tscn");
+		eliteTower = GD.Load<PackedScene>("res://Scenes/EliteTower.tscn");
+		masterTower = GD.Load<PackedScene>("res://Scenes/MasterTower.tscn");
+		ultimateTower = GD.Load<PackedScene>("res://Scenes/UltimateTower.tscn");
 	}
 
 	public Tower CreateTower(TowerType type)
 	{
 		PackedScene towerScene = type switch
 		{
-			TowerType.Basic => _basicTowerScene,
-			TowerType.Advanced => _advancedTowerScene,
-			TowerType.Elite => _eliteTowerScene,
-			TowerType.Master => _masterTowerScene,
-			TowerType.Ultimate => _ultimateTowerScene,
+			TowerType.Basic => basicTower,
+			TowerType.Advanced => advancedTower,
+			TowerType.Elite => eliteTower,
+			TowerType.Master => masterTower,
+			TowerType.Ultimate => ultimateTower,
 			_ => null
 		};
 
-		if (towerScene == null) 
-		{
-			GD.Print("No se pudo cargar la escena de la torre");
-			return null;
-		}
-
-		Tower tower = towerScene.Instantiate<Tower>();
-		if (tower != null)
-		{
-			GD.Print($"Torre creada del tipo {type} con costo {tower.Cost}");
-		}
-		return tower;
+		return towerScene?.Instantiate<Tower>();
 	}
 }

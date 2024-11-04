@@ -3,108 +3,98 @@ using System;
 
 public partial class Projectile : Node2D
 {
-	private Vector2 _targetPosition;
-	private float _speed = 300f;
-	private float _damage;
-	private Enemy _target;
-	private bool _isAreaDamage;
-	private float _damageRadius;
-	private bool _isSlowing;
-	private float _slowAmount;
-	private float _slowDuration;
-	private ColorRect _visual;
+	Vector2 targetPos;
+	float speed = 300f;
+	float dmg;
+	Enemy target;
+	bool isAoe;
+	float aoeDist;
+	bool isSlowing;
+	float slowAmt;
+	float slowTime;
+	ColorRect visual;
 
-	public void Initialize(Enemy target, float damage)
+	public void Initialize(Enemy tgt, float damage)
 	{
-		_target = target;
-		_damage = damage;
-		_isAreaDamage = false;
-		_isSlowing = false;
-		CreateProjectileSprite(Colors.Yellow);
-		GD.Print($"Proyectil simple inicializado. Daño: {damage}");
+		target = tgt;
+		dmg = damage;
+		isAoe = false;
+		isSlowing = false;
+		CreateBullet(Colors.Yellow);
 	}
 
-	public void InitializeAreaDamage(Enemy target, float damage, float radius)
+	public void InitializeAreaDamage(Enemy tgt, float damage, float radius)
 	{
-		_target = target;
-		_damage = damage;
-		_isAreaDamage = true;
-		_damageRadius = radius;
-		CreateProjectileSprite(Colors.Orange);
-		GD.Print($"Proyectil de área inicializado. Daño: {damage}, Radio: {radius}");
+		target = tgt;
+		dmg = damage;
+		isAoe = true;
+		aoeDist = radius;
+		CreateBullet(Colors.Orange);
 	}
 
-	public void InitializeSlowing(Enemy target, float damage, float slowAmount, float slowDuration)
+	public void InitializeSlowing(Enemy tgt, float damage, float slowAmount, float slowDuration)
 	{
-		_target = target;
-		_damage = damage;
-		_isSlowing = true;
-		_slowAmount = slowAmount;
-		_slowDuration = slowDuration;
-		CreateProjectileSprite(Colors.Blue);
-		GD.Print($"Proyectil ralentizador inicializado. Daño: {damage}, Ralentización: {slowAmount*100}%");
+		target = tgt;
+		dmg = damage;
+		isSlowing = true;
+		slowAmt = slowAmount;
+		slowTime = slowDuration;
+		CreateBullet(Colors.Blue);
 	}
 
-	private void CreateProjectileSprite(Color color)
+	void CreateBullet(Color color)
 	{
-		var colorRect = new ColorRect();
-		colorRect.Size = new Vector2(8, 8);
-		colorRect.Position = new Vector2(-4, -4);
-		colorRect.Color = color;
-		AddChild(colorRect);
+		var bullet = new ColorRect();
+		bullet.Size = new Vector2(8, 8);
+		bullet.Position = new Vector2(-4, -4);
+		bullet.Color = color;
+		AddChild(bullet);
 	}
 
 	public override void _Process(double delta)
 	{
-		if (_target == null || !IsInstanceValid(_target))
+		if (target == null || !IsInstanceValid(target))
 		{
 			QueueFree();
 			return;
 		}
 
-		Vector2 direction = (_target.GlobalPosition - GlobalPosition).Normalized();
-		Position += direction * _speed * (float)delta;
+		var dir = (target.GlobalPosition - GlobalPosition).Normalized();
+		Position += dir * speed * (float)delta;
 
-		if (GlobalPosition.DistanceTo(_target.GlobalPosition) < 10)
+		if (GlobalPosition.DistanceTo(target.GlobalPosition) < 10)
 		{
-			if (_isAreaDamage)
-			{
-				ApplyAreaDamage();
-			}
-			else if (_isSlowing)
-			{
-				ApplySlowingEffect();
-			}
+			if (isAoe)
+				HitArea();
+			else if (isSlowing)
+				HitWithSlow();
 			else
-			{
-				_target.TakeDamage(_damage);
-			}
+				target.TakeDamage(dmg);
+				
 			QueueFree();
 		}
 	}
 
-	private void ApplyAreaDamage()
+	void HitArea()
 	{
 		var enemies = GetTree().GetNodesInGroup("Enemies");
-		foreach (Node node in enemies)
+		foreach (Node n in enemies)
 		{
-			if (node is Enemy enemy && IsInstanceValid(enemy))
+			if (n is Enemy e && IsInstanceValid(e))
 			{
-				float distance = GlobalPosition.DistanceTo(enemy.GlobalPosition);
-				if (distance <= _damageRadius)
+				float dist = GlobalPosition.DistanceTo(e.GlobalPosition);
+				if (dist <= aoeDist)
 				{
-					float damageMultiplier = 1 - (distance / _damageRadius);
-					enemy.TakeDamage(_damage * damageMultiplier);
-					GD.Print($"Daño de área aplicado: {_damage * damageMultiplier}");
+					float dmgMult = 1 - (dist / aoeDist);
+					e.TakeDamage(dmg * dmgMult);
 				}
 			}
 		}
 	}
 
-	private void ApplySlowingEffect()
+	void HitWithSlow()
 	{
-		_target.TakeDamage(_damage);
-		_target.ApplySlow(_slowAmount, _slowDuration);
-		GD.Print($"Efecto de ralentización aplicado: {_slowAmount*100}% durante {_slowDuration}s");
+		target.TakeDamage(dmg);
+		target.ApplySlow(slowAmt, slowTime);
 	}
 }
